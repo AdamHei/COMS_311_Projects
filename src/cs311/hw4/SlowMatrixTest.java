@@ -20,7 +20,7 @@ public class SlowMatrixTest {
 //        System.out.println(totalTime[0]);
 
         for (IResult result: results){
-            System.out.println(result.getSize() + "," + result.getTime());
+            System.out.println(result.getSize() + " " + result.getTime());
         }
     }
 }

@@ -58,7 +58,7 @@ public class SlowMatrix implements IMatrix, IMeasurable {
                 int sum = 0;
                 int[] row = matrix[i];
                 for (int k = 0; k < multiplier.matrix[j].length; k++) {
-                    sum += row[k] * multiplier.matrix[j][k];
+                    sum += row[k] * multiplier.matrix[k][j];
                 }
                 product.setElement(i, j, sum);
             }
