@@ -63,37 +63,6 @@ public class TernarySearch {
         return null;
     }
 
-    //        while (true){
-//
-//            if (arr[left].compareTo(toFind) == 0){
-//                return arr[left];
-//            }
-//            if (arr[right].compareTo(toFind) == 0){
-//                return arr[right];
-//            }
-//
-//            if (right - left <= 2){
-//                if (arr[(left + right) / 2].compareTo(toFind) == 0){
-//                    return arr[(left + right) / 2];
-//                }
-//                return null;
-//            }
-//
-//            leftThird = left + (right - left) / 3;
-//            rightThird = right - (right - left) / 3;
-//
-//            if (toFind.compareTo(arr[leftThird]) <= 0){
-//                right = leftThird;
-//            }
-//            else if (toFind.compareTo(arr[rightThird]) >= 0){
-//                left = rightThird;
-//            }
-//            else {
-//                right = rightThird;
-//                left = leftThird;
-//            }
-//        }
-
     private static void printWithBounds(Node[] arr, int left, int right){
         for (int i = left; i <= right; i++){
             System.out.print(arr[i].data + " ");

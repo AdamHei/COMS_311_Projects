@@ -8,7 +8,7 @@ public class Graph<V, E> implements IGraph<V, E> {
     private Map<String, Vertex<V>> nameToVertex = new HashMap<>();
     private boolean isDirected;
 
-    public Graph(boolean directed){
+    public Graph(boolean directed) {
         isDirected = directed;
     }
 
@@ -19,15 +19,15 @@ public class Graph<V, E> implements IGraph<V, E> {
 
     @Override
     public void setUndirectedGraph() {
-        for (String vertex: nameToNeighbors.keySet()){
-            for (Edge<E> edge: nameToNeighbors.get(vertex)){
+        for (String vertex : nameToNeighbors.keySet()) {
+            for (Edge<E> edge : nameToNeighbors.get(vertex)) {
                 putEdgeNoException(edge.getVertexName2(), vertex, edge.getEdgeData());
             }
         }
         isDirected = false;
     }
 
-    private void putEdgeNoException(String vertex1, String vertex2, E edgeData){
+    private void putEdgeNoException(String vertex1, String vertex2, E edgeData) {
         List<Edge<E>> edges = nameToNeighbors.get(vertex1);
         for (Edge<E> edge : edges) {
             if (edge.getVertexName2().equals(vertex2) && edge.getEdgeData().equals(edgeData)) {
@@ -52,7 +52,7 @@ public class Graph<V, E> implements IGraph<V, E> {
         putVertex(vertexName, vertexData);
     }
 
-    private void putVertex(String vertexName, V vertexData){
+    private void putVertex(String vertexName, V vertexData) {
         if (containsVertex(vertexName)) throw new DuplicateVertexException();
 
         Vertex<V> v = new Vertex<>(vertexName, vertexData);
@@ -60,7 +60,7 @@ public class Graph<V, E> implements IGraph<V, E> {
         nameToNeighbors.put(vertexName, new ArrayList<>());
     }
 
-    private boolean containsVertex(String vertexName){
+    private boolean containsVertex(String vertexName) {
         return nameToVertex.keySet().contains(vertexName);
     }
 
@@ -74,17 +74,17 @@ public class Graph<V, E> implements IGraph<V, E> {
         putEdge(vertex1, vertex2, edgeData);
     }
 
-    private void putEdge(String vertex1, String vertex2, E edgeData){
+    private void putEdge(String vertex1, String vertex2, E edgeData) {
         if (!(containsVertex(vertex1) && containsVertex(vertex2))) throw new NoSuchVertexException();
 
-        for (Edge<E> edge: nameToNeighbors.get(vertex1)){
-            if (edge.getVertexName2().equals(vertex2)){
+        for (Edge<E> edge : nameToNeighbors.get(vertex1)) {
+            if (edge.getVertexName2().equals(vertex2)) {
                 throw new DuplicateEdgeException();
             }
         }
-        if (!isDirected){
-            for (Edge<E> edge: nameToNeighbors.get(vertex2)){
-                if (edge.getVertexName2().equals(vertex1)){
+        if (!isDirected) {
+            for (Edge<E> edge : nameToNeighbors.get(vertex2)) {
+                if (edge.getVertexName2().equals(vertex1)) {
                     throw new DuplicateEdgeException();
                 }
             }
@@ -93,7 +93,7 @@ public class Graph<V, E> implements IGraph<V, E> {
         List<Edge<E>> v1Edges = nameToNeighbors.get(vertex1);
         v1Edges.add(new Edge<>(vertex1, vertex2, edgeData));
 
-        if (!isDirected){
+        if (!isDirected) {
             List<Edge<E>> v2Edges = nameToNeighbors.get(vertex2);
             v2Edges.add(new Edge<>(vertex2, vertex1, edgeData));
         }
@@ -102,27 +102,24 @@ public class Graph<V, E> implements IGraph<V, E> {
     @Override
     public V getVertexData(String vertexName) throws NoSuchVertexException {
         if (!containsVertex(vertexName)) throw new NoSuchVertexException();
-
         return nameToVertex.get(vertexName).getVertexData();
     }
 
     @Override
     public void setVertexData(String vertexName, V vertexData) throws NoSuchVertexException {
         if (!containsVertex(vertexName)) throw new NoSuchVertexException();
-
-        nameToVertex.put(vertexName, new Vertex<V>(vertexName, vertexData));
+        nameToVertex.put(vertexName, new Vertex<>(vertexName, vertexData));
     }
 
     @Override
     public E getEdgeData(String vertex1, String vertex2) throws NoSuchVertexException, NoSuchEdgeException {
         if (!(containsVertex(vertex1) && containsVertex(vertex2))) throw new NoSuchVertexException();
 
-        for (Edge<E> edge: nameToNeighbors.get(vertex1)){
-            if (edge.getVertexName2().equals(vertex2)){
+        for (Edge<E> edge : nameToNeighbors.get(vertex1)) {
+            if (edge.getVertexName2().equals(vertex2)) {
                 return edge.getEdgeData();
             }
         }
-
         return null;
     }
 
@@ -133,16 +130,16 @@ public class Graph<V, E> implements IGraph<V, E> {
         boolean isSet = setEdge(vertex1, vertex2, edgeData);
         if (!isSet) throw new NoSuchEdgeException();
 
-        if (!isDirected){
+        if (!isDirected) {
             isSet = setEdge(vertex2, vertex1, edgeData);
             if (!isSet) throw new NoSuchEdgeException();
         }
     }
 
-    private boolean setEdge(String first, String second, E edgeData){
+    private boolean setEdge(String first, String second, E edgeData) {
         List<Edge<E>> edges = nameToNeighbors.get(first);
         for (int i = 0; i < edges.size(); i++) {
-            if (edges.get(i).getVertexName2().equals(second)){
+            if (edges.get(i).getVertexName2().equals(second)) {
                 Edge<E> edge = new Edge<>(first, second, edgeData);
                 edges.set(i, edge);
                 return true;
@@ -158,8 +155,8 @@ public class Graph<V, E> implements IGraph<V, E> {
 
     @Override
     public Edge<E> getEdge(String vertexName1, String vertexName2) {
-        for (Edge<E> edge: nameToNeighbors.get(vertexName1)){
-            if (edge.getVertexName2().equals(vertexName2)){
+        for (Edge<E> edge : nameToNeighbors.get(vertexName1)) {
+            if (edge.getVertexName2().equals(vertexName2)) {
                 return edge;
             }
         }
@@ -174,20 +171,17 @@ public class Graph<V, E> implements IGraph<V, E> {
     @Override
     public List<Edge<E>> getEdges() {
         List<Edge<E>> edges = new ArrayList<>();
-        nameToNeighbors.values().forEach(list -> list.forEach(edges::add));
-
+        nameToNeighbors.values()
+                .forEach(list -> list.forEach(edges::add));
         return edges;
     }
 
     @Override
     public List<Vertex<V>> getNeighbors(String vertex) {
         List<Vertex<V>> neighbors = new ArrayList<>();
-        nameToNeighbors.get(vertex).forEach(
-                neighborName ->
-                        neighbors.add(nameToVertex.get(neighborName.getVertexName2()))
-        );
-
+        nameToNeighbors.get(vertex)
+                .forEach(neighborName -> neighbors.add(nameToVertex.get(neighborName.getVertexName2()))
+                );
         return neighbors;
     }
-
 }
