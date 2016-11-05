@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.util.*;
 
+import static cs311.hw7.graphalgorithms.GraphAlgorithms.Kruscal;
 import static cs311.hw7.graphalgorithms.GraphAlgorithms.TopologicalSort;
 import static org.junit.Assert.assertEquals;
 
@@ -84,5 +85,35 @@ public class GraphAlgorithmsTests {
         assertEquals(Integer.valueOf(2), sorted.get(5).getVertexData());
     }
 
+//    @Test
+//    public void KruskalsSimpleTest() {
+//        IGraph<Integer, EdgeWeight> myGraph = new Graph<>(false);
+//
+//        for (int i = 1; i < 5; i++) {
+//            myGraph.addVertex(i + "", i);
+//        }
+//
+//        myGraph.addEdge("1", "2", new EdgeWeight(1));
+//        myGraph.addEdge("1", "4", new EdgeWeight(2));
+//        myGraph.addEdge("1", "3", new EdgeWeight(3));
+//        myGraph.addEdge("2", "3", new EdgeWeight(4));
+//        myGraph.addEdge("2", "4", new EdgeWeight(5));
+//        myGraph.addEdge("4", "3", new EdgeWeight(6));
+//
+//        IGraph<Integer, EdgeWeight> mst = Kruscal(myGraph);
+//
+//        for ()
+//    }
 
+    public static class EdgeWeight implements IWeight{
+        int weight;
+        public EdgeWeight(int w){
+            weight = w;
+        }
+
+        @Override
+        public double getWeight() {
+            return weight;
+        }
+    }
 }

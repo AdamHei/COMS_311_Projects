@@ -1,6 +1,7 @@
 
 package cs311.hw7.graphalgorithms;
 
+import cs311.hw7.graph.Graph;
 import cs311.hw7.graph.IGraph;
 import cs311.hw7.graph.IGraph.Vertex;
 
@@ -81,6 +82,84 @@ public class GraphAlgorithms {
     }
 
     public static <V, E extends IWeight> IGraph<V, E> Kruscal(IGraph<V, E> g) {
-        return null; // Dummy return - replace this.
+        IGraph<V, E> mst = new Graph<>(g.isDirectedGraph());
+        for (Vertex<V> vertex : g.getVertices()) {
+            mst.addVertex(vertex.getVertexName(), vertex.getVertexData());
+        }
+
+        List<IGraph.Edge<E>> allEdges = g.getEdges();
+
+        Collections.sort(allEdges, new EdgeComparator<>());
+
+        int edgeIndex = 0, i = 0;
+        int numVertices = g.getVertices().size();
+
+        Map<String, SubGraph<V>> subGraphMap = new HashMap<>();
+
+        for (Vertex<V> vertex: g.getVertices()){
+            SubGraph<V> subGraph = new SubGraph<>();
+            subGraph.parent = vertex;
+            subGraph.rank = 0;
+            subGraphMap.put(vertex.getVertexName(), subGraph);
+        }
+
+        while (edgeIndex < numVertices - 1){
+            IGraph.Edge<E> nextEdge = allEdges.get(i);
+
+            Vertex<V> fromRoot = findRootAndCollapse(subGraphMap, g.getVertex(nextEdge.getVertexName1()));
+            Vertex<V> toRoot = findRootAndCollapse(subGraphMap, g.getVertex(nextEdge.getVertexName2()));
+
+            if (!fromRoot.equals(toRoot)){
+                mst.addEdge(nextEdge.getVertexName1(), nextEdge.getVertexName2(), nextEdge.getEdgeData());
+                edgeIndex++;
+                union(subGraphMap, fromRoot, toRoot);
+            }
+
+            i++;
+        }
+
+        return mst;
+    }
+
+    private static <V> Vertex<V> findRootAndCollapse(Map<String, SubGraph<V>> subGraphs, Vertex<V> vertex){
+        String vertexName = vertex.getVertexName();
+
+        if (!subGraphs.get(vertexName).parent.equals(vertex)){
+            subGraphs.get(vertexName).parent = findRootAndCollapse(subGraphs, subGraphs.get(vertexName).parent);
+        }
+
+        return subGraphs.get(vertexName).parent;
+    }
+
+    private static <V> void union(Map<String, SubGraph<V>> subGraphs, Vertex<V> thing1, Vertex<V> thing2){
+        Vertex<V> firstRoot = findRootAndCollapse(subGraphs, thing1);
+        Vertex<V> secondRoot = findRootAndCollapse(subGraphs, thing2);
+        String firstName = firstRoot.getVertexName();
+        String secondName = secondRoot.getVertexName();
+
+        if (subGraphs.get(firstName).rank < subGraphs.get(secondName).rank){
+            subGraphs.get(firstName).parent = secondRoot;
+        }
+        else if (subGraphs.get(firstName).rank > subGraphs.get(secondName).rank){
+            subGraphs.get(secondName).parent = firstRoot;
+        }
+        else {
+            subGraphs.get(secondName).parent = firstRoot;
+            subGraphs.get(firstName).rank++;
+        }
+    }
+
+    private static class SubGraph<V> {
+        Vertex<V> parent;
+        int rank;
+    }
+
+    private static class EdgeComparator<E extends IWeight> implements Comparator<IGraph.Edge<E>> {
+        @Override
+        public int compare(IGraph.Edge<E> o1, IGraph.Edge<E> o2) {
+            if (o1.getEdgeData().getWeight() < o2.getEdgeData().getWeight()) return -1;
+            if (o1.getEdgeData().getWeight() > o2.getEdgeData().getWeight()) return 1;
+            return 0;
+        }
     }
 }
