@@ -8,8 +8,8 @@ public class Graph<V, E> implements IGraph<V, E> {
     private Map<String, Vertex<V>> nameToVertex = new HashMap<>();
     private boolean isDirected;
 
-    public Graph(boolean directed) {
-        isDirected = directed;
+    public Graph() {
+        isDirected = true;
     }
 
     @Override

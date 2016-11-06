@@ -82,7 +82,9 @@ public class GraphAlgorithms {
     }
 
     public static <V, E extends IWeight> IGraph<V, E> Kruscal(IGraph<V, E> g) {
-        IGraph<V, E> mst = new Graph<>(g.isDirectedGraph());
+        IGraph<V, E> mst = new Graph<>();
+        mst.setUndirectedGraph();
+
         for (Vertex<V> vertex : g.getVertices()) {
             mst.addVertex(vertex.getVertexName(), vertex.getVertexData());
         }
@@ -154,7 +156,7 @@ public class GraphAlgorithms {
         int rank;
     }
 
-    private static class EdgeComparator<E extends IWeight> implements Comparator<IGraph.Edge<E>> {
+    static class EdgeComparator<E extends IWeight> implements Comparator<IGraph.Edge<E>> {
         @Override
         public int compare(IGraph.Edge<E> o1, IGraph.Edge<E> o2) {
             if (o1.getEdgeData().getWeight() < o2.getEdgeData().getWeight()) return -1;

@@ -10,9 +10,9 @@ import static cs311.hw7.graphalgorithms.GraphAlgorithms.AllTopologicalSort;
 
 public class Main {
     public static void main(String[] args) {
-        IGraph<Integer, Integer> graph = new Graph<>(true);
+        IGraph<Integer, Integer> graph = new Graph<>();
 
-        graph = new Graph<>(true);
+        graph = new Graph<>();
         graph.addVertex("1", 1);
         graph.addVertex("2", 2);
         graph.addVertex("3", 3);

@@ -17,7 +17,7 @@ public class GraphAlgorithmsTests {
     private List<IGraph.Vertex<Integer>> sorted;
 
     private void init100Nodes() {
-        graph = new Graph<>(true);
+        graph = new Graph<>();
         for (int i = 0; i < 101; i++) {
             graph.addVertex(i + "", i);
         }
@@ -41,7 +41,9 @@ public class GraphAlgorithmsTests {
     public void allToOne() {
         init100Nodes();
         for (int i = 0; i < 101; i++) {
-            graph.addEdge(i + "", 50 + "");
+            if (i != 50){
+                graph.addEdge(i + "", 50 + "");
+            }
         }
 
         sorted = TopologicalSort(graph);
@@ -50,7 +52,7 @@ public class GraphAlgorithmsTests {
 
     @Test
     public void sizeOne() {
-        graph = new Graph<>(true);
+        graph = new Graph<>();
         graph.addVertex("1", 1);
 
         sorted = TopologicalSort(graph);
@@ -59,7 +61,7 @@ public class GraphAlgorithmsTests {
 
     @Test
     public void regularTopo() {
-        graph = new Graph<>(true);
+        graph = new Graph<>();
         graph.addVertex("1", 1);
         graph.addVertex("2", 2);
         graph.addVertex("3", 3);
@@ -85,29 +87,38 @@ public class GraphAlgorithmsTests {
         assertEquals(Integer.valueOf(2), sorted.get(5).getVertexData());
     }
 
-//    @Test
-//    public void KruskalsSimpleTest() {
-//        IGraph<Integer, EdgeWeight> myGraph = new Graph<>(false);
-//
-//        for (int i = 1; i < 5; i++) {
-//            myGraph.addVertex(i + "", i);
-//        }
-//
-//        myGraph.addEdge("1", "2", new EdgeWeight(1));
-//        myGraph.addEdge("1", "4", new EdgeWeight(2));
-//        myGraph.addEdge("1", "3", new EdgeWeight(3));
-//        myGraph.addEdge("2", "3", new EdgeWeight(4));
-//        myGraph.addEdge("2", "4", new EdgeWeight(5));
-//        myGraph.addEdge("4", "3", new EdgeWeight(6));
-//
-//        IGraph<Integer, EdgeWeight> mst = Kruscal(myGraph);
-//
-//        for ()
-//    }
+    @Test
+    public void KruskalsSimpleTest() {
+        IGraph<Integer, EdgeWeight> myGraph = new Graph<>();
 
-    public static class EdgeWeight implements IWeight{
+        for (int i = 1; i < 5; i++) {
+            myGraph.addVertex(i + "", i);
+        }
+
+        myGraph.addEdge("1", "2", new EdgeWeight(1));
+        myGraph.addEdge("1", "4", new EdgeWeight(2));
+        myGraph.addEdge("1", "3", new EdgeWeight(3));
+        myGraph.addEdge("2", "3", new EdgeWeight(4));
+        myGraph.addEdge("2", "4", new EdgeWeight(5));
+        myGraph.addEdge("4", "3", new EdgeWeight(6));
+
+        IGraph<Integer, EdgeWeight> mst = Kruscal(myGraph);
+
+        List<IGraph.Edge<EdgeWeight>> edges = mst.getEdges();
+
+        Collections.sort(edges, new GraphAlgorithms.EdgeComparator<>());
+
+        assertEquals(1.0, edges.get(0).getEdgeData().getWeight(), .001);
+        assertEquals(1.0, edges.get(1).getEdgeData().getWeight(), .001);
+        assertEquals(2.0, edges.get(2).getEdgeData().getWeight(), .001);
+        assertEquals(2.0, edges.get(3).getEdgeData().getWeight(), .001);
+        assertEquals(3.0, edges.get(4).getEdgeData().getWeight(), .001);
+        assertEquals(3.0, edges.get(5).getEdgeData().getWeight(), .001);
+    }
+
+    private class EdgeWeight implements IWeight{
         int weight;
-        public EdgeWeight(int w){
+        EdgeWeight(int w){
             weight = w;
         }
 
