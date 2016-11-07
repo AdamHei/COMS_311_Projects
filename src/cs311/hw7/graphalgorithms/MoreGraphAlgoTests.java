@@ -180,7 +180,7 @@ public class MoreGraphAlgoTests<V, E extends IWeight> {
         before.addEdge("D", "B", null);
         before.addEdge("C", "D", null);
 
-        List<Vertex<V>> list_res = GraphAlgorithms.TopologicalSort(before);
+        List<IGraph.Vertex<V>> list_res = GraphAlgorithms.TopologicalSort(before);
 
         assertEquals("Topological Sort List size does not match expected size", expected_all.get(0).size(), list_res.size());
         assertTrue("Topological Sort not in expected list", expected_all.contains(list_res));
