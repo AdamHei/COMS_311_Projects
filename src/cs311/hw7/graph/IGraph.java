@@ -315,7 +315,7 @@ public interface IGraph<V, E>
     {
     }
 
-    public final static class NoSuchEdgeException extends Exception
+    public final static class NoSuchEdgeException extends RuntimeException
     {
     }
 }

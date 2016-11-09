@@ -173,7 +173,7 @@ public class GraphTest<V, E extends IWeight> {
         }
 
         g.setUndirectedGraph();
-        assertEquals(g.getEdge("b", "a"), g.getEdge("a", "b"));
+        assertEquals(g.getEdge("b", "a").getEdgeData(), g.getEdge("a", "b").getEdgeData());
     }
 
     @Test
@@ -201,7 +201,8 @@ public class GraphTest<V, E extends IWeight> {
     private final String KERMIT = "Kermit the Frog";
     private final String RALPH = "Ralph the Dog";
 
-    @Test public void testAddVertices() {
+    @Test
+    public void testAddVertices() {
         Graph<String, String> test = new Graph<String, String>();
         test.addVertex("A");
         test.addVertex("B");
@@ -224,7 +225,8 @@ public class GraphTest<V, E extends IWeight> {
         }
     }
 
-    @Test public void testAddVerticesFailure() {
+    @Test
+    public void testAddVerticesFailure() {
         Graph<String, String> test = new Graph<String, String>();
         test.addVertex("A");
         test.addVertex("B");
@@ -241,7 +243,8 @@ public class GraphTest<V, E extends IWeight> {
         fail("Failed to throw DuplicateVertexException when adding duplicate vertex.");
     }
 
-    @Test public void testNeighborsDirected() {
+    @Test
+    public void testNeighborsDirected() {
         Graph<String, String> test = new Graph<String, String>();
         test.setDirectedGraph();
 
@@ -266,7 +269,8 @@ public class GraphTest<V, E extends IWeight> {
         assertEquals("Expected 0 neighbors of C", 0, arr.size());
     }
 
-    @Test public void testNeighborsUndirected() {
+    @Test
+    public void testNeighborsUndirected() {
         Graph<String, String> test = new Graph<String, String>();
         test.setUndirectedGraph();
 
@@ -290,7 +294,8 @@ public class GraphTest<V, E extends IWeight> {
         assertEquals("Expected 1 neighbors of C", 1, arr.size());
     }
 
-    @Test public void testDuplicateEdgesDirected() {
+    @Test
+    public void testDuplicateEdgesDirected() {
         Graph<String, String> test = new Graph<String, String>();
         test.setDirectedGraph();
 
@@ -316,7 +321,8 @@ public class GraphTest<V, E extends IWeight> {
         fail("Graph class did not throw DuplicateEdgeException where expected.");
     }
 
-    @Test public void testDuplicateEdgesUndirected() {
+    @Test
+    public void testDuplicateEdgesUndirected() {
         Graph<String, String> test = new Graph<String, String>();
         test.setUndirectedGraph();
 
@@ -338,7 +344,8 @@ public class GraphTest<V, E extends IWeight> {
         fail("Graph class did not throw DuplicateEdgeException where expected.");
     }
 
-    @Test public void testAddEdgeWithInvalidVertices() {
+    @Test
+    public void testAddEdgeWithInvalidVertices() {
         Graph<String, String> test = new Graph<String, String>();
         test.addVertex("A");
         test.addVertex("B");
@@ -353,7 +360,8 @@ public class GraphTest<V, E extends IWeight> {
         fail("Invalid edge added. Cannot add edge (A,C) with no such vertex C.");
     }
 
-    @Test public void testVertexData() {
+    @Test
+    public void testVertexData() {
         Graph<String, String> test = new Graph<String, String>();
         test.addVertex("A", KERMIT);
         test.addVertex("B", RALPH);
@@ -362,7 +370,8 @@ public class GraphTest<V, E extends IWeight> {
         assertEquals(RALPH, test.getVertexData("B"));
     }
 
-    @Test public void testEdgeData() {
+    @Test
+    public void testEdgeData() {
         Graph<String, String> test = new Graph<String, String>();
         test.setDirectedGraph();
         test.addVertex("A");
@@ -379,7 +388,8 @@ public class GraphTest<V, E extends IWeight> {
         }
     }
 
-    @Test public void testEdgeDataUndirected() {
+    @Test
+    public void testEdgeDataUndirected() {
         Graph<String, String> test = new Graph<String, String>();
         test.setUndirectedGraph();
         test.addVertex("A");
@@ -395,7 +405,8 @@ public class GraphTest<V, E extends IWeight> {
         }
     }
 
-    @Test public void testVertexDataFailure() {
+    @Test
+    public void testVertexDataFailure() {
         Graph<String, String> test = new Graph<String, String>();
         test.addVertex("A", KERMIT);
         test.addVertex("B", RALPH);
@@ -410,7 +421,8 @@ public class GraphTest<V, E extends IWeight> {
         fail("Graph class failed to throw NoSuchVertexException.");
     }
 
-    @Test public void testEdgeDataFailure() {
+    @Test
+    public void testEdgeDataFailure() {
         Graph<String, String> test = new Graph<String, String>();
         test.setDirectedGraph();
         test.addVertex("A");

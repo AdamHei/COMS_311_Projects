@@ -253,21 +253,21 @@ public class Graph<V, E> implements IGraph<V, E> {
     }
 
     /**
-     * Simple edge retrieval
+     * Simple edge retrieval with possible no such edge.
+     * User assumes a directed edge from vertex1 to vertex2 exists
      *
      * @param vertexName1 Vertex one of edge.
      * @param vertexName2 Vertex two of edge.
      * @return The edge
      */
     @Override
-    public Edge<E> getEdge(String vertexName1, String vertexName2) {
+    public Edge<E> getEdge(String vertexName1, String vertexName2) throws NoSuchEdgeException {
         for (Edge<E> edge : nameToNeighbors.get(vertexName1)) {
             if (edge.getVertexName2().equals(vertexName2)) {
                 return edge;
             }
         }
-        //TODO See if I should throw an exception instead
-        return null;
+        throw new NoSuchEdgeException();
     }
 
     /**
@@ -279,6 +279,13 @@ public class Graph<V, E> implements IGraph<V, E> {
     }
 
     /**
+     * IMPORTANT: IN AN UNDIRECTED GRAPH, IF EDGE (A,B) IS IN THE GRAPH, THAT EDGE AND EDGE (B,A) WILL
+     * BE PART OF THIS LIST. THEY ARE TECHNICALLY THE SAME EDGE WITH THE SAME DATA, BUT PER
+     * THE JAVADOC FOR setUndirectedGraph(), EDGE (A,B) AND EDGE (B,A) ARE TWO DIFFERENT IMPLEMENTATIONS
+     * OF THE SAME EDGE THAT COEXIST
+     * THE IMPLICATION IS THE SIZE OF getEdges() WILL TECHNICALLY BE TWICE AS MANY EDGES ARE IN THE
+     * "UNDIRECTED" GRAPH
+     *
      * @return A list of all edges in the graph
      */
     @Override

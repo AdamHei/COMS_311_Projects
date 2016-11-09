@@ -1,14 +1,14 @@
 package cs311.hw7.graphalgorithms;
 
-import static org.junit.Assert.*;
+import cs311.hw7.graph.Graph;
+import cs311.hw7.graph.IGraph;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
-
-import cs311.hw7.graph.Graph;
-import cs311.hw7.graph.IGraph;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class GraphAlgorithmsTest {
 
@@ -96,7 +96,7 @@ public class GraphAlgorithmsTest {
     }
 
     @Test
-    public void testAllTopologicalSort2(){
+    public void testAllTopologicalSort2() {
         //test graph with multiple toposorts
         Graph<Integer, Integer> g2 = new Graph<>();
         g2.setDirectedGraph();
@@ -139,7 +139,7 @@ public class GraphAlgorithmsTest {
     }
 
     @Test
-    public void testAllTopologicalSort3(){
+    public void testAllTopologicalSort3() {
         //in a graph with no edges and n vetices, we should have n! valid sorts
         Graph<Integer, Integer> g3 = new Graph<>();
         g3.setDirectedGraph();
@@ -196,26 +196,26 @@ public class GraphAlgorithmsTest {
         assertEquals(new IntWeight(7), mst2.getEdgeData("e", "f"));
     }
 
-    public static class IntWeight implements IWeight{
+    public static class IntWeight implements IWeight {
         int w;
 
-        public IntWeight(int w){
+        public IntWeight(int w) {
             this.w = w;
         }
 
-        public double getWeight(){
+        public double getWeight() {
             return w;
         }
 
-        public boolean equals(Object obj){
-            if(this == obj)
+        public boolean equals(Object obj) {
+            if (this == obj)
                 return true;
-            if(obj == null)
+            if (obj == null)
                 return false;
-            if(getClass() != obj.getClass())
+            if (getClass() != obj.getClass())
                 return false;
 
-            return w == ((IntWeight)obj).w;
+            return w == ((IntWeight) obj).w;
         }
     }
 
