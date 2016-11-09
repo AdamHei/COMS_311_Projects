@@ -1,9 +1,13 @@
 package cs311.hw7.graph;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Generic Graph implementation. Flexible between either directed or un-directed
+ *
  * @param <V> Internal Vertex Data Type
  * @param <E> Internal Edge Data Type
  */
@@ -20,7 +24,8 @@ public class Graph<V, E> implements IGraph<V, E> {
     /**
      * Default Constructor
      */
-    public Graph(){}
+    public Graph() {
+    }
 
     /**
      * All undirected graphs are already directed, so only a flag switch is needed
@@ -48,7 +53,7 @@ public class Graph<V, E> implements IGraph<V, E> {
     private void putEdgeNoException(String vertex1, String vertex2, E edgeData) {
         List<Edge<E>> edges = nameToNeighbors.get(vertex1);
         for (Edge<E> edge : edges) {
-            if (edge.getVertexName2().equals(vertex2) && edge.getEdgeData().equals(edgeData)) {
+            if (edge.getVertexName2().equals(vertex2) && (edge.getEdgeData() == null || edge.getEdgeData().equals(edgeData))) {
                 return;
             }
         }
@@ -65,8 +70,8 @@ public class Graph<V, E> implements IGraph<V, E> {
 
     /**
      * Adds a vertex with the given name and no internal data
-     * @param vertexName The unique name of the vertex.
      *
+     * @param vertexName The unique name of the vertex.
      * @throws DuplicateVertexException Thrown if the vertex already exists
      */
     @Override
@@ -76,6 +81,7 @@ public class Graph<V, E> implements IGraph<V, E> {
 
     /**
      * Similar to the above function, only with (hopefully) non-null data
+     *
      * @param vertexName The name of the new vertex
      * @param vertexData It's internal data
      * @throws DuplicateVertexException Thrown if vertex already exists
@@ -101,11 +107,11 @@ public class Graph<V, E> implements IGraph<V, E> {
 
     /**
      * Similar to addVertex(), only for edges.
+     *
      * @param vertex1 The first vertex in the edge.
      * @param vertex2 The second vertex in the edge.
-     *
      * @throws DuplicateEdgeException Thrown if edge already exists
-     * @throws NoSuchVertexException Thrown if either vertex is not in the graph
+     * @throws NoSuchVertexException  Thrown if either vertex is not in the graph
      */
     @Override
     public void addEdge(String vertex1, String vertex2) throws DuplicateEdgeException, NoSuchVertexException {
@@ -114,12 +120,12 @@ public class Graph<V, E> implements IGraph<V, E> {
 
     /**
      * Similar to the above function, only with (hopefully) non-null data
-     * @param vertex1 The first vertex in the edge.
-     * @param vertex2 The second vertex in the edge.
-     * @param edgeData The generic edge data.
      *
+     * @param vertex1  The first vertex in the edge.
+     * @param vertex2  The second vertex in the edge.
+     * @param edgeData The generic edge data.
      * @throws DuplicateEdgeException Thrown if the edge already exists
-     * @throws NoSuchVertexException Thrown if either vertex is not in the graph
+     * @throws NoSuchVertexException  Thrown if either vertex is not in the graph
      */
     @Override
     public void addEdge(String vertex1, String vertex2, E edgeData) throws DuplicateEdgeException, NoSuchVertexException {
@@ -154,8 +160,8 @@ public class Graph<V, E> implements IGraph<V, E> {
 
     /**
      * Retrieves a vertex's internal data
-     * @param vertexName  Name of vertex to get data for
      *
+     * @param vertexName Name of vertex to get data for
      * @return Internal vertex data
      * @throws NoSuchVertexException Thrown if vertex is not in the graph
      */
@@ -167,9 +173,9 @@ public class Graph<V, E> implements IGraph<V, E> {
 
     /**
      * Overwrites or places a new vertex in the graph with updated data, as vertices are immutable
+     *
      * @param vertexName The name of the vertex.
      * @param vertexData The generic vertex data.
-     *
      * @throws NoSuchVertexException Thrown if vertex is not in graph
      */
     @Override
@@ -180,12 +186,12 @@ public class Graph<V, E> implements IGraph<V, E> {
 
     /**
      * Retrieves the generic internal edge data
+     *
      * @param vertex1 Vertex one of the edge.
      * @param vertex2 Vertex two of the edge.
-     *
      * @return The edge's data if present
      * @throws NoSuchVertexException Thrown if either vertex is not present
-     * @throws NoSuchEdgeException Thrown if no edge exists from vertex1 to 2
+     * @throws NoSuchEdgeException   Thrown if no edge exists from vertex1 to 2
      */
     @Override
     public E getEdgeData(String vertex1, String vertex2) throws NoSuchVertexException, NoSuchEdgeException {
@@ -201,13 +207,12 @@ public class Graph<V, E> implements IGraph<V, E> {
 
     /**
      * Overwrites an edge's internal data
+     *
      * @param vertex1  Vertex one of the edge.
      * @param vertex2  Vertex two of the edge.
-     *
      * @param edgeData The generic edge data.
-     *
      * @throws NoSuchVertexException Thrown if either vertex is not present
-     * @throws NoSuchEdgeException Thrown if the edge is not already in the graph
+     * @throws NoSuchEdgeException   Thrown if the edge is not already in the graph
      */
     @Override
     public void setEdgeData(String vertex1, String vertex2, E edgeData) throws NoSuchVertexException, NoSuchEdgeException {
@@ -237,19 +242,21 @@ public class Graph<V, E> implements IGraph<V, E> {
 
     /**
      * Simple retrieval for a vertex
+     *
      * @param VertexName The name of the vertex.
      * @return The vertex associated with the name
      */
     @Override
-    public Vertex<V> getVertex(String VertexName) {
+    public Vertex<V> getVertex(String VertexName) throws NoSuchVertexException {
+        if (!nameToVertex.containsKey(VertexName)) throw new NoSuchVertexException();
         return nameToVertex.get(VertexName);
     }
 
     /**
      * Simple edge retrieval
+     *
      * @param vertexName1 Vertex one of edge.
      * @param vertexName2 Vertex two of edge.
-     *
      * @return The edge
      */
     @Override
