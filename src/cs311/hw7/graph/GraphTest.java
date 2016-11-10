@@ -282,7 +282,7 @@ public class GraphTest<V, E extends IWeight> {
         test.addEdge("A", "C");
 
         // Make sure we actually have 2 edges.
-        assertEquals(4, test.getEdges().size());
+        assertEquals(2, test.getEdges().size());
 
         // Get the neighbors of A, this should be both B and C.
         List<IGraph.Vertex<String>> arr = test.getNeighbors("A");

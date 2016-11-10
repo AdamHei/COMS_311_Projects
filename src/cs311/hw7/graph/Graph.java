@@ -1,9 +1,6 @@
 package cs311.hw7.graph;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Generic Graph implementation. Flexible between either directed or un-directed
@@ -279,21 +276,75 @@ public class Graph<V, E> implements IGraph<V, E> {
     }
 
     /**
-     * IMPORTANT: IN AN UNDIRECTED GRAPH, IF EDGE (A,B) IS IN THE GRAPH, THAT EDGE AND EDGE (B,A) WILL
-     * BE PART OF THIS LIST. THEY ARE TECHNICALLY THE SAME EDGE WITH THE SAME DATA, BUT PER
-     * THE JAVADOC FOR setUndirectedGraph(), EDGE (A,B) AND EDGE (B,A) ARE TWO DIFFERENT IMPLEMENTATIONS
-     * OF THE SAME EDGE THAT COEXIST
-     * THE IMPLICATION IS THE SIZE OF getEdges() WILL TECHNICALLY BE TWICE AS MANY EDGES ARE IN THE
-     * "UNDIRECTED" GRAPH
+     * If directed, simply add all edges to a list
+     * Else, add edges but check for duplicates
+     *
+     * IMPORTANT: INTERNALLY, UNDIRECTED GRAPHS REFLECT THE JAVADOC FOR setUndirectedGraph()
+     * EDGE (X,Y) IS IN THE GRAPH IFF EDGE (Y,X) IS IN THE GRAPH
+     * THUS, WE HAVE TO ENSURE WE RETURN ONLY THE RELEVANT EDGES
      *
      * @return A list of all edges in the graph
      */
     @Override
     public List<Edge<E>> getEdges() {
         List<Edge<E>> edges = new ArrayList<>();
-        nameToNeighbors.values()
-                .forEach(list -> list.forEach(edges::add));
+
+        if (isDirected) {
+            nameToNeighbors.values()
+                    .forEach(list -> list.forEach(edges::add));
+        } else {
+            Set<NamePair> seen = new HashSet<>();
+            for (List<Edge<E>> neighborList : nameToNeighbors.values()) {
+                for (Edge<E> edge : neighborList) {
+                    NamePair pair = new NamePair(edge.getVertexName1(), edge.getVertexName2());
+                    if (!seen.contains(pair)) {
+                        edges.add(edge);
+                    }
+                    seen.add(pair);
+                }
+            }
+        }
+
         return edges;
+    }
+
+    //Used for getEdges() when graph is undirected to avoid an n^2 solution
+    private class NamePair implements Map.Entry<String, String> {
+        String vertex1, vertex2;
+
+        NamePair(String v1, String v2) {
+            vertex1 = v1;
+            vertex2 = v2;
+        }
+
+        @Override
+        public String getKey() {
+            return vertex1;
+        }
+
+        @Override
+        public String getValue() {
+            return vertex2;
+        }
+
+        @Override
+        public String setValue(String value) {
+            return vertex2 = value;
+        }
+
+        @Override
+        public int hashCode() {
+            return vertex2.hashCode() + vertex1.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (other.getClass().equals(NamePair.class)) {
+                NamePair o = (NamePair) other;
+                return o.vertex1.equals(vertex2) && o.vertex2.equals(vertex1) || vertex1.equals(o.vertex1) && vertex2.equals(o.vertex2);
+            }
+            return false;
+        }
     }
 
     /**

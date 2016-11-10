@@ -90,6 +90,7 @@ public class GraphAlgorithmsTests {
     @Test
     public void KruskalsSimpleTest() {
         IGraph<Integer, EdgeWeight> myGraph = new Graph<>();
+        myGraph.setUndirectedGraph();
 
         for (int i = 1; i < 5; i++) {
             myGraph.addVertex(i + "", i);
@@ -109,11 +110,8 @@ public class GraphAlgorithmsTests {
         Collections.sort(edges, new GraphAlgorithms.EdgeComparator<>());
 
         assertEquals(1.0, edges.get(0).getEdgeData().getWeight(), .001);
-        assertEquals(1.0, edges.get(1).getEdgeData().getWeight(), .001);
-        assertEquals(2.0, edges.get(2).getEdgeData().getWeight(), .001);
-        assertEquals(2.0, edges.get(3).getEdgeData().getWeight(), .001);
-        assertEquals(3.0, edges.get(4).getEdgeData().getWeight(), .001);
-        assertEquals(3.0, edges.get(5).getEdgeData().getWeight(), .001);
+        assertEquals(2.0, edges.get(1).getEdgeData().getWeight(), .001);
+        assertEquals(3.0, edges.get(2).getEdgeData().getWeight(), .001);
     }
 
     private class EdgeWeight implements IWeight{

@@ -167,7 +167,7 @@ public class GraphAlgorithmsTest {
         g1.addEdge("b", "c", new IntWeight(3));
 
         IGraph<Integer, IntWeight> mst1 = GraphAlgorithms.Kruscal(g1);
-        assertEquals(4, mst1.getEdges().size());
+        assertEquals(2, mst1.getEdges().size());
         assertEquals(new IntWeight(1), mst1.getEdgeData("a", "b"));
         assertEquals(new IntWeight(2), mst1.getEdgeData("a", "c"));
 
@@ -188,7 +188,7 @@ public class GraphAlgorithmsTest {
         g2.addEdge("e", "f", new IntWeight(7));
 
         IGraph<Integer, IntWeight> mst2 = GraphAlgorithms.Kruscal(g2);
-        assertEquals(10, mst2.getEdges().size());
+        assertEquals(5, mst2.getEdges().size());
         assertEquals(new IntWeight(1), mst2.getEdgeData("a", "b"));
         assertEquals(new IntWeight(2), mst2.getEdgeData("b", "c"));
         assertEquals(new IntWeight(3), mst2.getEdgeData("b", "e"));
