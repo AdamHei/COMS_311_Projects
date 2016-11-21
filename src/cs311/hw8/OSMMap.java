@@ -2,7 +2,10 @@ package cs311.hw8;
 
 import cs311.hw8.graph.Graph;
 import cs311.hw8.graph.IGraph;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -16,7 +19,6 @@ import java.util.List;
 public class OSMMap {
 
     private IGraph<NodeData, EdgeData> map;
-    //C:/Users/Adam/Desktop/AmesMap.txt
     private final static String LOCAL_FILE = "C:/Users/Adam/Desktop/AmesMap.txt";
 
     /**
@@ -26,11 +28,9 @@ public class OSMMap {
     public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
         OSMMap osmMap = new OSMMap();
 
-        double start = System.currentTimeMillis();
         osmMap.LoadMap(LOCAL_FILE);
-        System.out.println("That took " + ((System.currentTimeMillis() - start) / 1000) + " seconds");
 
-        System.out.println(osmMap.TotalDistance());
+        System.out.println("Total distance " + osmMap.TotalDistance());
     }
 
     /**
@@ -61,7 +61,8 @@ public class OSMMap {
     private void initNodes(Document doc) {
         NodeList nodes = doc.getElementsByTagName("node");
 
-        for (int i = 0; i < nodes.getLength(); i++) {
+        int length = nodes.getLength();
+        for (int i = 0; i < length; i++) {
             Element element = (Element) nodes.item(i);
 
             String id = element.getAttribute("id");
@@ -129,9 +130,9 @@ public class OSMMap {
     }
 
 
-
     /**
      * Distance formula courtesy of GeoDataSource at http://www.geodatasource.com/developers/java
+     *
      * @return The distance between two coordinate pairs in miles
      */
     private double distance(double lat1, double lon1, double lat2, double lon2) {
@@ -151,7 +152,6 @@ public class OSMMap {
     private double rad2deg(double rad) {
         return (rad * 180 / Math.PI);
     }
-
 
 
     private Document buildDoc(String f) throws ParserConfigurationException, IOException, SAXException {
