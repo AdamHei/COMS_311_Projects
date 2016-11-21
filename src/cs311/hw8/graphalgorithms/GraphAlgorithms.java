@@ -31,7 +31,7 @@ public class GraphAlgorithms {
             Vertex<V> vertex = heap.poll();
             marked.put(vertex.getVertexName(), true);
             for (Vertex<V> neighbor : g.getNeighbors(vertex.getVertexName())) {
-                if (!marked.get(neighbor.getVertexName())) {
+                if (!marked.get(neighbor.getVertexName()) && !heap.contains(neighbor)) {
                     heap.add(neighbor);
                 }
                 double currentDistance = distTo.get(neighbor.getVertexName());
