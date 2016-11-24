@@ -1,0 +1,68 @@
+package cs311.hw8;
+
+import cs311.hw8.OSMMap.Location;
+import org.junit.Before;
+import org.junit.Test;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static cs311.hw8.OSMMap.LOCAL_FILE;
+import static junit.framework.TestCase.assertEquals;
+
+public class ShortestRouteTests {
+    private OSMMap osmMap;
+    private List<String> route, ids, computedRoute;
+
+    @Before
+    public void setUp() throws ParserConfigurationException, SAXException, IOException {
+        osmMap = new OSMMap();
+        osmMap.LoadMap(LOCAL_FILE);
+    }
+
+    @Test
+    public void scubaShopToByAmesHigh() {
+        route = Arrays.asList("Oakland Street", "North Hyland Avenue", "Pammel Drive", "University Boulevard", "Haber Road", "13th Street", "Summit Avenue", "Ridgewood Avenue", "20th Street", "Hayes Avenue");
+
+        Location scubaShop = new Location(42.028297, -93.664099);
+        Location byAmesHigh = new Location(42.042134, -93.631865);
+        buildIDS(scubaShop, byAmesHigh);
+
+        computedRoute = osmMap.StreetRoute(ids);
+        assertEquals(route, computedRoute);
+    }
+
+    @Test
+    public void stCeciliaToIDKWhere() {
+        route = Arrays.asList("Hoover Avenue", "Wheeler Street", "Nixon Avenue");
+
+        Location idkwhere = new Location(42.054168, -93.628094);
+        Location stcecilia = new Location(42.048464, -93.630068);
+        buildIDS(stcecilia, idkwhere);
+
+        computedRoute = osmMap.StreetRoute(ids);
+        assertEquals(route, computedRoute);
+    }
+
+    @Test
+    public void selfLoop() {
+        route = new ArrayList<>();
+
+        Location idkwhere = new Location(42.054168, -93.628094);
+        buildIDS(idkwhere, idkwhere);
+
+        computedRoute = osmMap.StreetRoute(ids);
+        assertEquals(route, computedRoute);
+    }
+
+    private void buildIDS(Location... args) {
+        ids = new ArrayList<>();
+        for (Location location : args) {
+            ids.add(osmMap.ClosestRoad(location));
+        }
+    }
+}

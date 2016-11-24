@@ -19,18 +19,16 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cs311.hw8.graphalgorithms.GraphAlgorithms.ShortestPath;
 
 public class OSMMap {
 
-    private IGraph<NodeData, EdgeData> map;
-    private final static String LOCAL_FILE = "C:/Users/Adam/Desktop/AmesMap.txt";
+    //TODO Make private
+    IGraph<NodeData, EdgeData> map;
+    final static String LOCAL_FILE = "C:/Users/Adam/Desktop/AmesMap.txt";
 
     /**
      * Print the approximate number of miles of roadway in Ames using AmesMap.txt
@@ -47,17 +45,16 @@ public class OSMMap {
 
         List<String> routePairs = Files.readAllLines(Paths.get(routeFileName));
         List<String> locationIDs = new ArrayList<>();
-        for (String pair: routePairs){
+        for (String pair : routePairs) {
+            //Parse coordinates and find closest node
             String[] latAndLon = pair.split(" ");
             double lat = Double.parseDouble(latAndLon[0]), lon = Double.parseDouble(latAndLon[1]);
             Location location = new Location(lat, lon);
-            String id = osmMap.ClosestRoad(location);
 
-            NodeData data = osmMap.map.getVertexData(id);
-            System.out.println("Closest is: " + data.latitude + ", " + data.longitude);
+            String id = osmMap.ClosestRoad(location);
             locationIDs.add(id);
         }
-//        System.out.println("There are roughly " + (osmMap.map.getEdges().size() / 2) + " street in Ames");
+
         List<String> streetNames = osmMap.StreetRoute(locationIDs);
         streetNames.forEach(System.out::println);
     }
@@ -155,7 +152,6 @@ public class OSMMap {
 
         double distance = distance(fromData.latitude, fromData.longitude, toData.latitude, toData.longitude);
 
-//        System.out.println("Adding street from " + from + " to " + to);
         map.addEdge(from, to, new EdgeData(name, distance));
     }
 
@@ -186,11 +182,11 @@ public class OSMMap {
     }
 
 
-    private Document buildDoc(String f) throws ParserConfigurationException, IOException, SAXException {
+    private Document buildDoc(String filename) throws ParserConfigurationException, IOException, SAXException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
 
-        Document doc = builder.parse(new File(f));
+        Document doc = builder.parse(new File(filename));
         doc.normalize();
         return doc;
     }
@@ -235,20 +231,35 @@ public class OSMMap {
     }
 
     public List<String> StreetRoute(List<String> vertexIds) {
-        Set<String> streetNames = new HashSet<>();
         List<String> orderedNames = new ArrayList<>();
 
         for (int i = 0; i < vertexIds.size() - 1; i++) {
             List<Edge<EdgeData>> subPath = ShortestPath(map, vertexIds.get(i), vertexIds.get(i + 1));
-            System.out.println("Checking route from " + vertexIds.get(i) + " to " + vertexIds.get(i + 1) + "\n");
-            subPath.stream().filter(street -> !streetNames.contains(street.getEdgeData().streetName))
-                    .forEach(street -> {
-                        orderedNames.add(street.getEdgeData().streetName);
-                        streetNames.add(street.getEdgeData().streetName);
-            });
+            subPath = cleanList(subPath);
+
+            if (subPath.size() > 0 && orderedNames.size() > 0 && subPath.get(0).getEdgeData().streetName.equals(orderedNames.get(orderedNames.size() - 1))) {
+                //ShortestPath() accounts for duplicates but we have to here
+                subPath.remove(0);
+            }
+            subPath.forEach(street -> orderedNames.add(street.getEdgeData().streetName));
+        }
+        return orderedNames;
+    }
+
+    //Helper method to remove duplicates... Perhaps could be done better
+    private List<Edge<EdgeData>> cleanList(List<Edge<EdgeData>> list) {
+        List<Edge<EdgeData>> cleaned = new ArrayList<>();
+        if (list.size() > 0){
+            cleaned.add(list.get(0));
         }
 
-        return orderedNames;
+        for (Edge<EdgeData> edge : list) {
+            if (!cleaned.get(cleaned.size() - 1).getEdgeData().streetName.equals(edge.getEdgeData().streetName)) {
+                cleaned.add(edge);
+            }
+        }
+
+        return cleaned;
     }
 
     public static class Location {
@@ -277,7 +288,8 @@ public class OSMMap {
         }
     }
 
-    private class EdgeData implements IWeight {
+    //TODO Make Private
+    class EdgeData implements IWeight {
         double distance;
         String streetName;
 

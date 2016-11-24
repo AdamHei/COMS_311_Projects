@@ -1,6 +1,7 @@
 
 package cs311.hw8.graphalgorithms;
 
+import cs311.hw8.OSMMap;
 import cs311.hw8.graph.Graph;
 import cs311.hw8.graph.IGraph;
 import cs311.hw8.graph.IGraph.Edge;
