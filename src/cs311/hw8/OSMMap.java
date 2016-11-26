@@ -19,7 +19,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static cs311.hw8.graphalgorithms.GraphAlgorithms.ShortestPath;
@@ -28,22 +30,39 @@ public class OSMMap {
 
     //TODO Make private
     IGraph<NodeData, EdgeData> map;
-    final static String LOCAL_FILE = "C:/Users/Adam/Desktop/AmesMap.txt";
+    final String LOCAL_FILE = "C:/Users/Adam/Desktop/AmesMap.txt";
 
     /**
      * Print the approximate number of miles of roadway in Ames using AmesMap.txt
      * ~Total Edge length / 2
      */
-    public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
-        String mapFileName = args[0], routeFileName = args[1];
+    public static void main(String[] args) {
+        String mapFileName = args[0];
 
         OSMMap osmMap = new OSMMap();
         osmMap.LoadMap(mapFileName);
 
         System.out.println("Total distance " + osmMap.TotalDistance());
-        System.out.println();
+    }
 
-        List<String> routePairs = Files.readAllLines(Paths.get(routeFileName));
+    /**
+     * Print the streets along the route from each vertex
+     * @param args The filenames of the map and route files to parse
+     */
+    public static void main3(String[] args) {
+        String mapFileName = args[0], routeFileName = args[1];
+
+        OSMMap osmMap = new OSMMap();
+        osmMap.LoadMap(mapFileName);
+
+        List<String> routePairs = null;
+        try {
+            routePairs = Files.readAllLines(Paths.get(routeFileName));
+        } catch (IOException e) {
+            System.out.println("Invalid filename");
+            System.exit(1);
+        }
+
         List<String> locationIDs = new ArrayList<>();
         for (String pair : routePairs) {
             //Parse coordinates and find closest node
@@ -66,28 +85,52 @@ public class OSMMap {
         refreshMap();
     }
 
+    //Helper method to build a fresh map
     private void refreshMap() {
         map = new Graph<>();
         map.setDirectedGraph();
     }
 
     /**
+     * Attempts to initialize the map-graph from the given XML file
      * @param filename The filename of the XML map to load
      */
-    public void LoadMap(String filename) throws IOException, SAXException, ParserConfigurationException {
+    public void LoadMap(String filename) {
         refreshMap();
-        Document doc = buildDoc(filename);
-        initNodes(doc);
-        initStreets(doc);
+        Optional<Document> doc = buildDoc(filename);
+        if (doc.isPresent()) {
+            initNodes(doc.get());
+            initStreets(doc.get());
+        }
     }
 
+    //Attempts to build a Document object from the given filename
+    //Uses optionals to avoid null-checks
+    private Optional<Document> buildDoc(String filename) {
+        if (filename.length() == 0) return Optional.empty();
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder;
+        try {
+            builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new File(filename));
+            doc.normalize();
+            return Optional.of(doc);
+
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
+    //Finds all node tags in the XML document and constructs vertices with the latitude and longitude in the element
     private void initNodes(Document doc) {
         NodeList nodes = doc.getElementsByTagName("node");
 
+        //Most inefficient getLength() method ever
         int length = nodes.getLength();
         for (int i = 0; i < length; i++) {
+            //Every node should be an element
             Element element = (Element) nodes.item(i);
-
             String id = element.getAttribute("id");
             double latitude = Double.parseDouble(element.getAttribute("lat"));
             double longitude = Double.parseDouble(element.getAttribute("lon"));
@@ -96,6 +139,8 @@ public class OSMMap {
         }
     }
 
+    //Similar to initNodes(), constructs edges in the graph that have "highway" and "name" attributes
+    //Accounts for one-way edges as well
     private void initStreets(Document doc) {
         NodeList edges = doc.getElementsByTagName("way");
 
@@ -146,6 +191,7 @@ public class OSMMap {
         }
     }
 
+    //Helper method for adding an edge with the given name and computed distance in the graph
     private void addStreet(String from, String to, String name) {
         NodeData fromData = map.getVertexData(from);
         NodeData toData = map.getVertexData(to);
@@ -168,7 +214,7 @@ public class OSMMap {
         dist = rad2deg(dist);
         dist = dist * 60 * 1.1515;
 
-        return (dist);
+        return dist;
     }
 
     @Contract(pure = true)
@@ -181,22 +227,20 @@ public class OSMMap {
         return (rad * 180 / Math.PI);
     }
 
-
-    private Document buildDoc(String filename) throws ParserConfigurationException, IOException, SAXException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-
-        Document doc = builder.parse(new File(filename));
-        doc.normalize();
-        return doc;
-    }
-
+    /**
+     * @return Half of all edge distances
+     */
     public double TotalDistance() {
         final double[] total = {0.0};
         map.getEdges().forEach(edge -> total[0] += edge.getEdgeData().distance);
         return total[0] / 2;
     }
 
+    /**
+     * Finds the vertex closest to the given location utilizing the distance() formula
+     * @param location The source location
+     * @return The id of the vertex closest to the given location
+     */
     public String ClosestRoad(Location location) {
         double minDistance = Double.POSITIVE_INFINITY;
         String closestId = "";
@@ -213,6 +257,13 @@ public class OSMMap {
         return closestId;
     }
 
+    /**
+     * Finds the ordered list of vertex ids along the shortest path from one location to the other
+     * @param fromLocation The starting location
+     * @param toLocation The target location
+     * @return The list of vertex ids along the shortest path
+     */
+    //TODO What if either location has no neighbors?
     public List<String> ShortestRoute(Location fromLocation, Location toLocation) {
         String fromId = ClosestRoad(fromLocation);
         String toId = ClosestRoad(toLocation);
@@ -230,6 +281,11 @@ public class OSMMap {
         return pathIds;
     }
 
+    /**
+     * The ordered list of street names along the shortest route that hits every vertex given
+     * @param vertexIds The vertices to visit
+     * @return The sequentially-duplicate-free path along the vertices
+     */
     public List<String> StreetRoute(List<String> vertexIds) {
         List<String> orderedNames = new ArrayList<>();
 
@@ -279,7 +335,11 @@ public class OSMMap {
         }
     }
 
-    private class NodeData {
+    /**
+     * Generic Vertex data class that stores coordinates
+     */
+    //TODO Make private
+    public class NodeData {
         double latitude, longitude;
 
         NodeData(double lat, double lon) {
@@ -288,6 +348,9 @@ public class OSMMap {
         }
     }
 
+    /**
+     * Generic Edge data class that represents street name and length of street
+     */
     //TODO Make Private
     class EdgeData implements IWeight {
         double distance;
@@ -302,5 +365,31 @@ public class OSMMap {
         public double getWeight() {
             return distance;
         }
+    }
+
+
+
+    //TODO Delete me
+    public String closestVertexIDwithNeighbors(String id){
+        List<String> allVertices = new ArrayList<>();
+        map.getVertices().forEach(nodeDataVertex -> allVertices.add(nodeDataVertex.getVertexName()));
+
+        String closest = "";
+        double distance = Double.POSITIVE_INFINITY;
+
+        double idLat = map.getVertexData(id).latitude;
+        double idLon = map.getVertexData(id).longitude;
+
+        for (String location: allVertices){
+            NodeData temp = map.getVertexData(location);
+            double tempDist = distance(idLat, idLon, temp.latitude, temp.longitude);
+            if (map.getNeighbors(location).size() > 0 && tempDist < distance) {
+                closest = location;
+                distance = tempDist;
+            }
+        }
+        if (closest.length() == 0) System.out.println("Bruh it didn't work");
+
+        return closest;
     }
 }

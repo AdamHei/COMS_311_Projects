@@ -3,15 +3,11 @@ package cs311.hw8;
 import cs311.hw8.OSMMap.Location;
 import org.junit.Before;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static cs311.hw8.OSMMap.LOCAL_FILE;
 import static junit.framework.TestCase.assertEquals;
 
 public class ShortestRouteTests {
@@ -19,9 +15,9 @@ public class ShortestRouteTests {
     private List<String> route, ids, computedRoute;
 
     @Before
-    public void setUp() throws ParserConfigurationException, SAXException, IOException {
+    public void setUp() {
         osmMap = new OSMMap();
-        osmMap.LoadMap(LOCAL_FILE);
+        osmMap.LoadMap(osmMap.LOCAL_FILE);
     }
 
     @Test
@@ -59,9 +55,24 @@ public class ShortestRouteTests {
         assertEquals(route, computedRoute);
     }
 
-    private void buildIDS(Location... args) {
+    @Test
+    public void rectangle() {
+        route = Arrays.asList("Lincoln Way", "Gilchrist Street", "Lincoln Way", "Grand Avenue", "13th Street", "Ontario Street", "North Dakota Avenue", "South Dakota Avenue", "Lincoln Way");
+
+        Location SDandLincoln = new Location(42.0229098, -93.6786571);
+        Location lincolnandGrand = new Location(42.0227968, -93.6199806);
+        Location grandand13th = new Location(42.034584, -93.6204082);
+        Location ontarioandnorthdakota = new Location(42.0345699, -93.6788083);
+
+        buildIDS(SDandLincoln, lincolnandGrand, grandand13th, ontarioandnorthdakota, SDandLincoln);
+
+        computedRoute = osmMap.StreetRoute(ids);
+        assertEquals(route, computedRoute);
+    }
+
+    private void buildIDS(Location... locales) {
         ids = new ArrayList<>();
-        for (Location location : args) {
+        for (Location location : locales) {
             ids.add(osmMap.ClosestRoad(location));
         }
     }

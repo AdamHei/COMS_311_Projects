@@ -1,6 +1,5 @@
 package cs311.hw8;
 
-import cs311.hw8.OSMMap.Location;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -9,31 +8,44 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static cs311.hw8.OSMMap.LOCAL_FILE;
-
-/**
- * Created by Adam on 11/23/2016.
- */
 public class Playground {
-    public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
+    public static void main(String[] args) {
         OSMMap osmMap = new OSMMap();
-        osmMap.LoadMap(LOCAL_FILE);
+        osmMap.LoadMap(osmMap.LOCAL_FILE);
 
-        Location scubaShop = new Location(42.028297, -93.664099);
-        Location tylersAppt = new Location(42.025460, -93.659164);
-        Location amesWestSideStorage = new Location(42.036617, -93.681695);
-        Location caseysNorth = new Location(42.056790, -93.643500);
-        Location amesHigh = new Location(42.040529, -93.634627);
-        Location byAmesHigh = new Location(42.042134, -93.631865);
-        Location idkwhere = new Location(42.054168, -93.628094);
-        Location stcecilia = new Location(42.048464, -93.630068);
+        String sbux1 = "972593630";
+        String cafeDiem = "972627391";
+        String groveCafe = "972633979";
+        String theCafe = "1292348200";
+        String bergiesEspresso = "1868149731";
+        String stompingGrounds = "1933284322";
+        String cafeBeaudelaire = "2400994656";
+        String dunkinDonuts = "2400994660";
+        String arcadia = "2523851119";
+        String cafeMood = "2531586088";
+        String vinylCafe = "3154706612";
+        String caribouCoffee = "3641409028";
+        String sbux2 = "4162641133";
+        String sbux3 = "972593630";
 
-        List<Location> locations = Arrays.asList(idkwhere, stcecilia);
-        List<String> vertexIds = new ArrayList<>();
-        locations.forEach(location -> vertexIds.add(osmMap.ClosestRoad(location)));
 
-        vertexIds.forEach(id -> {
-            System.out.println("Id: " + id + " has " + osmMap.map.getNeighbors(id).size() + " edges.");
+        List<String> ids = Arrays.asList(sbux1, cafeDiem, groveCafe, theCafe, bergiesEspresso, stompingGrounds, cafeBeaudelaire, dunkinDonuts, arcadia, cafeMood, vinylCafe, caribouCoffee, sbux2, sbux3);
+        List<String> idsWithNeighbors = new ArrayList<>();
+        ids.forEach(id -> {
+            String closestIdWithNeighbors = osmMap.closestVertexIDwithNeighbors(id);
+            idsWithNeighbors.add(closestIdWithNeighbors);
         });
+
+        idsWithNeighbors.forEach(location -> System.out.println(osmMap.map.getVertexData(location).latitude + ", " + osmMap.map.getVertexData(location).longitude));
+
+        List<String> route = osmMap.StreetRoute(idsWithNeighbors);
+
+        System.out.println();
+
+        for (String local : route) {
+            System.out.println(local);
+        }
     }
+
+
 }
