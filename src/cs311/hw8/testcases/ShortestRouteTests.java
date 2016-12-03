@@ -1,5 +1,6 @@
-package cs311.hw8;
+package cs311.hw8.testcases;
 
+import cs311.hw8.OSMMap;
 import cs311.hw8.OSMMap.Location;
 import org.junit.Before;
 import org.junit.Test;

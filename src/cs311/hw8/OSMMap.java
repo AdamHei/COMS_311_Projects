@@ -5,7 +5,6 @@ import cs311.hw8.graph.IGraph;
 import cs311.hw8.graph.IGraph.Edge;
 import cs311.hw8.graph.IGraph.Vertex;
 import cs311.hw8.graphalgorithms.IWeight;
-import org.jetbrains.annotations.Contract;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -28,9 +27,8 @@ import static cs311.hw8.graphalgorithms.GraphAlgorithms.ShortestPath;
 
 public class OSMMap {
 
-    //TODO Make private
-    IGraph<NodeData, EdgeData> map;
-    final String LOCAL_FILE = "C:/Users/Adam/Desktop/AmesMap.txt";
+    private IGraph<NodeData, EdgeData> map;
+    public final String LOCAL_FILE = "C:/Users/Adam/Desktop/AmesMap.txt";
 
     /**
      * Print the approximate number of miles of roadway in Ames using AmesMap.txt
@@ -42,7 +40,7 @@ public class OSMMap {
         OSMMap osmMap = new OSMMap();
         osmMap.LoadMap(mapFileName);
 
-        System.out.println("Total distance " + osmMap.TotalDistance());
+        System.out.println("Total distance: " + osmMap.TotalDistance());
     }
 
     /**
@@ -204,7 +202,6 @@ public class OSMMap {
 
     /**
      * Distance formula courtesy of GeoDataSource at http://www.geodatasource.com/developers/java
-     *
      * @return The distance between two coordinate pairs in miles
      */
     private double distance(double lat1, double lon1, double lat2, double lon2) {
@@ -217,12 +214,10 @@ public class OSMMap {
         return dist;
     }
 
-    @Contract(pure = true)
     private double deg2rad(double deg) {
         return (deg * Math.PI / 180.0);
     }
 
-    @Contract(pure = true)
     private double rad2deg(double rad) {
         return (rad * 180 / Math.PI);
     }
@@ -246,10 +241,10 @@ public class OSMMap {
         String closestId = "";
 
         for (Vertex<NodeData> node : map.getVertices()) {
-            Location temp = new Location(node.getVertexData().latitude, node.getVertexData().longitude);
-            double distance = distance(location.getLatitude(), location.getLongitude(), temp.getLatitude(), temp.getLongitude());
-            if (distance < minDistance) {
-                minDistance = distance;
+            Location tempLocation = new Location(node.getVertexData().latitude, node.getVertexData().longitude);
+            double tempDistance = distance(location.getLatitude(), location.getLongitude(), tempLocation.getLatitude(), tempLocation.getLongitude());
+            if (tempDistance < minDistance && map.getNeighbors(node.getVertexName()).size() > 0) {
+                minDistance = tempDistance;
                 closestId = node.getVertexName();
             }
         }
@@ -263,7 +258,6 @@ public class OSMMap {
      * @param toLocation The target location
      * @return The list of vertex ids along the shortest path
      */
-    //TODO What if either location has no neighbors?
     public List<String> ShortestRoute(Location fromLocation, Location toLocation) {
         String fromId = ClosestRoad(fromLocation);
         String toId = ClosestRoad(toLocation);
@@ -321,7 +315,7 @@ public class OSMMap {
     public static class Location {
         double latitude, longitude;
 
-        Location(double lat, double lon) {
+        public Location(double lat, double lon) {
             latitude = lat;
             longitude = lon;
         }
@@ -338,8 +332,7 @@ public class OSMMap {
     /**
      * Generic Vertex data class that stores coordinates
      */
-    //TODO Make private
-    public class NodeData {
+    private class NodeData {
         double latitude, longitude;
 
         NodeData(double lat, double lon) {
@@ -351,8 +344,7 @@ public class OSMMap {
     /**
      * Generic Edge data class that represents street name and length of street
      */
-    //TODO Make Private
-    class EdgeData implements IWeight {
+    private class EdgeData implements IWeight {
         double distance;
         String streetName;
 
@@ -365,31 +357,5 @@ public class OSMMap {
         public double getWeight() {
             return distance;
         }
-    }
-
-
-
-    //TODO Delete me
-    public String closestVertexIDwithNeighbors(String id){
-        List<String> allVertices = new ArrayList<>();
-        map.getVertices().forEach(nodeDataVertex -> allVertices.add(nodeDataVertex.getVertexName()));
-
-        String closest = "";
-        double distance = Double.POSITIVE_INFINITY;
-
-        double idLat = map.getVertexData(id).latitude;
-        double idLon = map.getVertexData(id).longitude;
-
-        for (String location: allVertices){
-            NodeData temp = map.getVertexData(location);
-            double tempDist = distance(idLat, idLon, temp.latitude, temp.longitude);
-            if (map.getNeighbors(location).size() > 0 && tempDist < distance) {
-                closest = location;
-                distance = tempDist;
-            }
-        }
-        if (closest.length() == 0) System.out.println("Bruh it didn't work");
-
-        return closest;
     }
 }

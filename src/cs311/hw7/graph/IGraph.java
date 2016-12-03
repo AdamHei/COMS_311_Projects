@@ -189,7 +189,7 @@ public interface IGraph<V, E>
         private final String vertex;
         private final V vertexData;
 
-        //TODO Make Vertex Protected Again #MVPA
+        //Make Vertex Protected Again #MVPA
         protected Vertex(String v, V d)
         {
             vertex = v;

@@ -1,4 +1,4 @@
-package cs311.hw8;
+package cs311.hw8.testcases;
 
 import cs311.hw8.graph.Graph;
 import cs311.hw8.graph.IGraph;
@@ -18,7 +18,7 @@ public class DijkstraTestCases {
     private IGraph<Integer, EdgeWeight> graph;
 
     @Test
-    public void noReach(){
+    public void noReach() {
         graph = new Graph<>();
         graph.setUndirectedGraph();
         initNNodes(20);
@@ -27,11 +27,10 @@ public class DijkstraTestCases {
         for (int i = 0; i < 20; i++) {
             int left = rand.nextInt(20) + 1;
             int right = rand.nextInt(20) + 1;
-            if (left != 17 && right != 17){
+            if (left != 17 && right != 17) {
                 try {
                     graph.addEdge(left + "", right + "", new EdgeWeight(rand.nextInt()));
-                }
-                catch (IGraph.DuplicateEdgeException e) {
+                } catch (IGraph.DuplicateEdgeException e) {
                     //Everything is fine
                     i--;
                 }
@@ -75,7 +74,7 @@ public class DijkstraTestCases {
         assertEquals(path.get(2).getVertexName2(), "1");
     }
 
-    private void initNNodes(int n){
+    private void initNNodes(int n) {
         for (int i = 1; i <= n; i++) {
             graph.addVertex(i + "", i);
         }
@@ -83,7 +82,8 @@ public class DijkstraTestCases {
 
     private static class EdgeWeight implements IWeight {
         int weight;
-        EdgeWeight(int w){
+
+        EdgeWeight(int w) {
             weight = w;
         }
 
