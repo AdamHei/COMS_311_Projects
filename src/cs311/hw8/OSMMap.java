@@ -34,7 +34,7 @@ public class OSMMap {
      * Print the approximate number of miles of roadway in Ames using AmesMap.txt
      * ~Total Edge length / 2
      */
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         String mapFileName = args[0];
 
         OSMMap osmMap = new OSMMap();
@@ -45,6 +45,7 @@ public class OSMMap {
 
     /**
      * Print the streets along the route from each vertex
+     *
      * @param args The filenames of the map and route files to parse
      */
     public static void main3(String[] args) {
@@ -91,6 +92,7 @@ public class OSMMap {
 
     /**
      * Attempts to initialize the map-graph from the given XML file
+     *
      * @param filename The filename of the XML map to load
      */
     public void LoadMap(String filename) {
@@ -202,6 +204,7 @@ public class OSMMap {
 
     /**
      * Distance formula courtesy of GeoDataSource at http://www.geodatasource.com/developers/java
+     *
      * @return The distance between two coordinate pairs in miles
      */
     private double distance(double lat1, double lon1, double lat2, double lon2) {
@@ -233,6 +236,7 @@ public class OSMMap {
 
     /**
      * Finds the vertex closest to the given location utilizing the distance() formula
+     *
      * @param location The source location
      * @return The id of the vertex closest to the given location
      */
@@ -254,8 +258,9 @@ public class OSMMap {
 
     /**
      * Finds the ordered list of vertex ids along the shortest path from one location to the other
+     *
      * @param fromLocation The starting location
-     * @param toLocation The target location
+     * @param toLocation   The target location
      * @return The list of vertex ids along the shortest path
      */
     public List<String> ShortestRoute(Location fromLocation, Location toLocation) {
@@ -277,6 +282,7 @@ public class OSMMap {
 
     /**
      * The ordered list of street names along the shortest route that hits every vertex given
+     *
      * @param vertexIds The vertices to visit
      * @return The sequentially-duplicate-free path along the vertices
      */
@@ -299,7 +305,7 @@ public class OSMMap {
     //Helper method to remove duplicates... Perhaps could be done better
     private List<Edge<EdgeData>> cleanList(List<Edge<EdgeData>> list) {
         List<Edge<EdgeData>> cleaned = new ArrayList<>();
-        if (list.size() > 0){
+        if (list.size() > 0) {
             cleaned.add(list.get(0));
         }
 
