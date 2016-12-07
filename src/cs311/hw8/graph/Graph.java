@@ -278,7 +278,7 @@ public class Graph<V, E> implements IGraph<V, E> {
     /**
      * If directed, simply add all edges to a list
      * Else, add edges but check for duplicates
-     *
+     * <p>
      * IMPORTANT: INTERNALLY, UNDIRECTED GRAPHS REFLECT THE JAVADOC FOR setUndirectedGraph()
      * EDGE (X,Y) IS IN THE GRAPH IFF EDGE (Y,X) IS IN THE GRAPH
      * THUS, WE HAVE TO ENSURE WE RETURN ONLY THE RELEVANT EDGES

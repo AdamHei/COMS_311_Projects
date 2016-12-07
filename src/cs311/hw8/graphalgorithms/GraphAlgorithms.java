@@ -1,7 +1,6 @@
 
 package cs311.hw8.graphalgorithms;
 
-import cs311.hw8.OSMMap;
 import cs311.hw8.graph.Graph;
 import cs311.hw8.graph.IGraph;
 import cs311.hw8.graph.IGraph.Edge;
@@ -183,12 +182,13 @@ public class GraphAlgorithms {
     public static <V, E extends IWeight> IGraph<V, E> Kruscal(IGraph<V, E> g) {
         //The number of edges in the graph must at least be the number of vertices - 1
         //If the graph is not connected, we are not guaranteed that
-        if (!isConnected(g)) {
-            return g;
-        }
+//        if (!isConnected(g)) {
+//            return g;
+//        }
 
         IGraph<V, E> mst = new Graph<>();
-        mst.setUndirectedGraph();
+//        mst.setUndirectedGraph();
+        mst.setDirectedGraph();
 
         for (Vertex<V> vertex : g.getVertices()) {
             mst.addVertex(vertex.getVertexName(), vertex.getVertexData());
@@ -198,7 +198,7 @@ public class GraphAlgorithms {
 
         Collections.sort(allEdges, new EdgeComparator<>());
 
-        int edgeIndex = 0, i = 0;
+        int edgeCounter = 0, i = 0;
         int numVertices = g.getVertices().size();
 
         Map<String, SubGraph<V>> subGraphMap = new HashMap<>();
@@ -213,7 +213,7 @@ public class GraphAlgorithms {
 
         //Iteratively add new edges to the tree, ensuring no cycle is created
         //Ensures we only add as many edges as are necessary
-        while (edgeIndex < numVertices - 1) {
+        while (edgeCounter < numVertices - 1 && i < allEdges.size()) {
             Edge<E> nextEdge = allEdges.get(i);
 
             Vertex<V> fromRoot = findRootAndCollapse(subGraphMap, g.getVertex(nextEdge.getVertexName1()));
@@ -223,7 +223,7 @@ public class GraphAlgorithms {
             if (!fromRoot.equals(toRoot)) {
                 //Add them to our running tree and union their subtrees
                 mst.addEdge(nextEdge.getVertexName1(), nextEdge.getVertexName2(), nextEdge.getEdgeData());
-                edgeIndex++;
+                edgeCounter++;
                 union(subGraphMap, fromRoot, toRoot);
             }
 

@@ -23,12 +23,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static cs311.hw8.graphalgorithms.GraphAlgorithms.Kruscal;
 import static cs311.hw8.graphalgorithms.GraphAlgorithms.ShortestPath;
 
 public class OSMMap {
 
-    private IGraph<NodeData, EdgeData> map;
+    public IGraph<NodeData, EdgeData> map;
     public final String LOCAL_FILE = "C:/Users/Adam/Desktop/AmesMap.txt";
+
+    public static void main(String[] args) {
+        OSMMap osmMap = new OSMMap();
+        osmMap.LoadMap(osmMap.LOCAL_FILE);
+
+        osmMap.PipeDream();
+    }
 
     /**
      * Print the approximate number of miles of roadway in Ames using AmesMap.txt
@@ -54,12 +62,12 @@ public class OSMMap {
         OSMMap osmMap = new OSMMap();
         osmMap.LoadMap(mapFileName);
 
-        List<String> routePairs = null;
+        List<String> routePairs;
         try {
             routePairs = Files.readAllLines(Paths.get(routeFileName));
         } catch (IOException e) {
             System.out.println("Invalid filename");
-            System.exit(1);
+            return;
         }
 
         List<String> locationIDs = new ArrayList<>();
@@ -98,6 +106,7 @@ public class OSMMap {
     public void LoadMap(String filename) {
         refreshMap();
         Optional<Document> doc = buildDoc(filename);
+
         if (doc.isPresent()) {
             initNodes(doc.get());
             initStreets(doc.get());
@@ -118,8 +127,8 @@ public class OSMMap {
 
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     //Finds all node tags in the XML document and constructs vertices with the latitude and longitude in the element
@@ -272,7 +281,6 @@ public class OSMMap {
 
         if (path.size() > 0) {
             pathIds.add(path.get(0).getVertexName1());
-
             pathIds.addAll(path.stream()
                     .map(Edge::getVertexName2)
                     .collect(Collectors.toList()));
@@ -281,7 +289,7 @@ public class OSMMap {
     }
 
     /**
-     * The ordered list of street names along the shortest route that hits every vertex given
+     * The ordered list of street names along the route that hits every vertex given
      *
      * @param vertexIds The vertices to visit
      * @return The sequentially-duplicate-free path along the vertices
@@ -290,32 +298,20 @@ public class OSMMap {
         List<String> orderedNames = new ArrayList<>();
 
         for (int i = 0; i < vertexIds.size() - 1; i++) {
-            List<Edge<EdgeData>> subPath = ShortestPath(map, vertexIds.get(i), vertexIds.get(i + 1));
-            subPath = cleanList(subPath);
-
-            if (subPath.size() > 0 && orderedNames.size() > 0 && subPath.get(0).getEdgeData().streetName.equals(orderedNames.get(orderedNames.size() - 1))) {
-                //ShortestPath() accounts for duplicates but we have to here
-                subPath.remove(0);
+            Edge<EdgeData> edge = map.getEdge(vertexIds.get(i), vertexIds.get(i + 1));
+            if (orderedNames.size() == 0 || orderedNames.size() > 0 && !orderedNames.get(orderedNames.size() - 1).equals(edge.getEdgeData().streetName)) {
+                orderedNames.add(edge.getEdgeData().streetName);
             }
-            subPath.forEach(street -> orderedNames.add(street.getEdgeData().streetName));
         }
+
         return orderedNames;
     }
 
-    //Helper method to remove duplicates... Perhaps could be done better
-    private List<Edge<EdgeData>> cleanList(List<Edge<EdgeData>> list) {
-        List<Edge<EdgeData>> cleaned = new ArrayList<>();
-        if (list.size() > 0) {
-            cleaned.add(list.get(0));
-        }
-
-        for (Edge<EdgeData> edge : list) {
-            if (!cleaned.get(cleaned.size() - 1).getEdgeData().streetName.equals(edge.getEdgeData().streetName)) {
-                cleaned.add(edge);
-            }
-        }
-
-        return cleaned;
+    public void PipeDream() {
+        IGraph<NodeData, EdgeData> mst = Kruscal(map);
+        final double[] weightSum = {0.0};
+        mst.getEdges().forEach(edge -> weightSum[0] += edge.getEdgeData().getWeight());
+        System.out.println(weightSum[0]);
     }
 
     public static class Location {
@@ -338,8 +334,9 @@ public class OSMMap {
     /**
      * Generic Vertex data class that stores coordinates
      */
-    private class NodeData {
-        double latitude, longitude;
+    //TODO make private
+    public class NodeData {
+        public double latitude, longitude;
 
         NodeData(double lat, double lon) {
             latitude = lat;
@@ -350,7 +347,7 @@ public class OSMMap {
     /**
      * Generic Edge data class that represents street name and length of street
      */
-    private class EdgeData implements IWeight {
+    public class EdgeData implements IWeight {
         double distance;
         String streetName;
 

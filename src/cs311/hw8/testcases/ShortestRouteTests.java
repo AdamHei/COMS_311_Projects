@@ -7,13 +7,14 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 
 public class ShortestRouteTests {
     private OSMMap osmMap;
-    private List<String> route, ids, computedRoute;
+    private List<String> route, computedRoute;
 
     @Before
     public void setUp() {
@@ -27,9 +28,8 @@ public class ShortestRouteTests {
 
         Location scubaShop = new Location(42.028297, -93.664099);
         Location byAmesHigh = new Location(42.042134, -93.631865);
-        buildIDS(scubaShop, byAmesHigh);
 
-        computedRoute = osmMap.StreetRoute(ids);
+        computedRoute = osmMap.StreetRoute(osmMap.ShortestRoute(scubaShop, byAmesHigh));
         assertEquals(route, computedRoute);
     }
 
@@ -39,9 +39,8 @@ public class ShortestRouteTests {
 
         Location idkwhere = new Location(42.054168, -93.628094);
         Location stcecilia = new Location(42.048464, -93.630068);
-        buildIDS(stcecilia, idkwhere);
 
-        computedRoute = osmMap.StreetRoute(ids);
+        computedRoute = osmMap.StreetRoute(osmMap.ShortestRoute(stcecilia, idkwhere));
         assertEquals(route, computedRoute);
     }
 
@@ -50,31 +49,19 @@ public class ShortestRouteTests {
         route = new ArrayList<>();
 
         Location idkwhere = new Location(42.054168, -93.628094);
-        buildIDS(idkwhere, idkwhere);
 
-        computedRoute = osmMap.StreetRoute(ids);
+        computedRoute = osmMap.StreetRoute(osmMap.ShortestRoute(idkwhere, idkwhere));
         assertEquals(route, computedRoute);
     }
 
     @Test
-    public void rectangle() {
-        route = Arrays.asList("Lincoln Way", "Gilchrist Street", "Lincoln Way", "Grand Avenue", "13th Street", "Ontario Street", "North Dakota Avenue", "South Dakota Avenue", "Lincoln Way");
+    public void straight() {
+        route = Collections.singletonList("Lincoln Way");
 
         Location SDandLincoln = new Location(42.0229098, -93.6786571);
         Location lincolnandGrand = new Location(42.0227968, -93.6199806);
-        Location grandand13th = new Location(42.034584, -93.6204082);
-        Location ontarioandnorthdakota = new Location(42.0345699, -93.6788083);
 
-        buildIDS(SDandLincoln, lincolnandGrand, grandand13th, ontarioandnorthdakota, SDandLincoln);
-
-        computedRoute = osmMap.StreetRoute(ids);
+        computedRoute = osmMap.StreetRoute(osmMap.ShortestRoute(SDandLincoln, lincolnandGrand));
         assertEquals(route, computedRoute);
-    }
-
-    private void buildIDS(Location... locales) {
-        ids = new ArrayList<>();
-        for (Location location : locales) {
-            ids.add(osmMap.ClosestRoad(location));
-        }
     }
 }
