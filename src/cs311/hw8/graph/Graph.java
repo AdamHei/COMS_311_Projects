@@ -354,10 +354,9 @@ public class Graph<V, E> implements IGraph<V, E> {
     @Override
     public List<Vertex<V>> getNeighbors(String vertex) {
         List<Vertex<V>> neighbors = new ArrayList<>();
-        nameToNeighbors.get(vertex)
-                .forEach(neighborName ->
-                        neighbors.add(nameToVertex.get(neighborName.getVertexName2()))
-                );
+        nameToNeighbors.get(vertex).forEach(neighborName ->
+                neighbors.add(nameToVertex.get(neighborName.getVertexName2()))
+        );
         return neighbors;
     }
 }

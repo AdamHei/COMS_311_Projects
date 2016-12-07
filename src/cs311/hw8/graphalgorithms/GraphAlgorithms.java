@@ -13,11 +13,14 @@ import java.util.*;
  */
 public class GraphAlgorithms {
 
-    private static Map<String, Double> distTo = new HashMap<>();
-
     public static <V, E extends IWeight> List<Edge<E>> ShortestPath(IGraph<V, E> g, String vertexStart, String vertexEnd) {
         Map<String, Boolean> marked = new HashMap<>();
-        Queue<Vertex<V>> heap = new PriorityQueue<>(new VertexComparator<V>());
+        Map<String, Double> distTo = new HashMap<>();
+        Queue<Vertex<V>> heap = new PriorityQueue<>((Vertex<V> v1, Vertex<V> v2) -> {
+            if (distTo.get(v1.getVertexName()) < distTo.get(v2.getVertexName())) return -1;
+            if (distTo.get(v1.getVertexName()) > distTo.get(v2.getVertexName())) return 1;
+            return 0;
+        });
         Map<Vertex<V>, Vertex<V>> predecessor = new HashMap<>();
 
         g.getVertices().forEach(vertex -> {
@@ -54,15 +57,6 @@ public class GraphAlgorithms {
         }
 
         return shortestPath;
-    }
-
-    private static class VertexComparator<V> implements Comparator<Vertex<V>> {
-        @Override
-        public int compare(Vertex<V> o1, Vertex<V> o2) {
-            if (distTo.get(o1.getVertexName()) < distTo.get(o2.getVertexName())) return -1;
-            if (distTo.get(o1.getVertexName()) > distTo.get(o2.getVertexName())) return 1;
-            return 0;
-        }
     }
 
     /**

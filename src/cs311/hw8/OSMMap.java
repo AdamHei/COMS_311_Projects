@@ -298,7 +298,13 @@ public class OSMMap {
         List<String> orderedNames = new ArrayList<>();
 
         for (int i = 0; i < vertexIds.size() - 1; i++) {
-            Edge<EdgeData> edge = map.getEdge(vertexIds.get(i), vertexIds.get(i + 1));
+            Edge<EdgeData> edge;
+            try {
+                edge = map.getEdge(vertexIds.get(i), vertexIds.get(i + 1));
+            } catch (IGraph.NoSuchEdgeException e) {
+                System.out.println("There was no direct edge between " + vertexIds.get(i) + " and " + vertexIds.get(i + 1));
+                return new ArrayList<>();
+            }
             if (orderedNames.size() == 0 || orderedNames.size() > 0 && !orderedNames.get(orderedNames.size() - 1).equals(edge.getEdgeData().streetName)) {
                 orderedNames.add(edge.getEdgeData().streetName);
             }
