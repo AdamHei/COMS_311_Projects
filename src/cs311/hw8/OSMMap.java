@@ -31,7 +31,7 @@ public class OSMMap {
     public IGraph<NodeData, EdgeData> map;
     public final String LOCAL_FILE = "C:/Users/Adam/Desktop/AmesMap.txt";
 
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         OSMMap osmMap = new OSMMap();
         osmMap.LoadMap(osmMap.LOCAL_FILE);
 
@@ -48,7 +48,7 @@ public class OSMMap {
         OSMMap osmMap = new OSMMap();
         osmMap.LoadMap(mapFileName);
 
-        System.out.println("Total distance: " + osmMap.TotalDistance());
+        System.out.println(osmMap.TotalDistance());
     }
 
     /**
@@ -56,7 +56,7 @@ public class OSMMap {
      *
      * @param args The filenames of the map and route files to parse
      */
-    public static void main3(String[] args) {
+    public static void main(String[] args) {
         String mapFileName = args[0], routeFileName = args[1];
 
         OSMMap osmMap = new OSMMap();
@@ -66,22 +66,29 @@ public class OSMMap {
         try {
             routePairs = Files.readAllLines(Paths.get(routeFileName));
         } catch (IOException e) {
-            System.out.println("Invalid filename");
+            System.out.println(routeFileName + " is an invalid filename");
             return;
         }
 
-        List<String> locationIDs = new ArrayList<>();
-        for (String pair : routePairs) {
-            //Parse coordinates and find closest node
+        //Build an array of Locations along the route
+        List<String> shortestRouteVertexIds = new ArrayList<>();
+        Location[] locations = new Location[routePairs.size()];
+        for (int i = 0; i < routePairs.size(); i++) {
+            String pair = routePairs.get(i);
             String[] latAndLon = pair.split(" ");
             double lat = Double.parseDouble(latAndLon[0]), lon = Double.parseDouble(latAndLon[1]);
-            Location location = new Location(lat, lon);
-
-            String id = osmMap.ClosestRoad(location);
-            locationIDs.add(id);
+            locations[i] = new Location(lat, lon);
         }
 
-        List<String> streetNames = osmMap.StreetRoute(locationIDs);
+        //Add the vertex ids along the shortest route between every consecutive pairs of vertices
+        for (int j = 0; j < locations.length - 1; j++) {
+            List<String> subRoute = osmMap.ShortestRoute(locations[j], locations[j + 1]);
+            //Don't want consecutive same vertices
+            if (j > 0) subRoute.remove(0);
+            shortestRouteVertexIds.addAll(subRoute);
+        }
+
+        List<String> streetNames = osmMap.StreetRoute(shortestRouteVertexIds);
         streetNames.forEach(System.out::println);
     }
 
@@ -216,7 +223,7 @@ public class OSMMap {
      *
      * @return The distance between two coordinate pairs in miles
      */
-    private double distance(double lat1, double lon1, double lat2, double lon2) {
+    public double distance(double lat1, double lon1, double lat2, double lon2) {
         double theta = lon1 - lon2;
         double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
         dist = Math.acos(dist);
@@ -244,7 +251,7 @@ public class OSMMap {
     }
 
     /**
-     * Finds the vertex closest to the given location utilizing the distance() formula
+     * Finds the vertex closest to the given location with neighbors utilizing the distance() formula
      *
      * @param location The source location
      * @return The id of the vertex closest to the given location
@@ -318,6 +325,48 @@ public class OSMMap {
         final double[] weightSum = {0.0};
         mst.getEdges().forEach(edge -> weightSum[0] += edge.getEdgeData().getWeight());
         System.out.println(weightSum[0]);
+    }
+
+    public List<Vertex<NodeData>> ApproximateTSP(List<String> vertexIds) {
+        IGraph<NodeData, EdgeData> graph = new Graph<>();
+        graph.setUndirectedGraph();
+
+        vertexIds.forEach(vertex -> graph.addVertex(vertex, map.getVertexData(vertex)));
+
+        for (int i = 0; i < vertexIds.size() - 1; i++) {
+            String first = vertexIds.get(i);
+            for (int j = i + 1; j < vertexIds.size(); j++) {
+                String second = vertexIds.get(j);
+                List<Edge<EdgeData>> path = ShortestPath(map, first, second);
+                final double[] distance = {0.0};
+                path.forEach(edge -> distance[0] += edge.getEdgeData().getWeight());
+                graph.addEdge(first, second, new EdgeData(first + second, distance[0]));
+            }
+        }
+
+        IGraph<NodeData, EdgeData> mst = Kruscal(graph);
+
+        //Might be empty
+        Vertex<NodeData> start = mst.getVertices().get(0);
+        List<Vertex<NodeData>> tspPath = new ArrayList<>();
+
+        preorderTraversal(graph, start, tspPath);
+
+        //TODO Go back to start?
+//        tspPath.add(0, tspPath.get(tspPath.size() - 1));
+
+        return tspPath;
+
+//        tspPath.forEach(vertex -> System.out.println(graph.getVertexData(vertex.getVertexName()).latitude + ", " + graph.getVertexData(vertex.getVertexName()).longitude));
+    }
+
+    private void preorderTraversal(IGraph<NodeData, EdgeData> graph, Vertex<NodeData> vertex, List<Vertex<NodeData>> tspPath){
+        tspPath.add(0, vertex);
+        for (Vertex<NodeData> neighbor: graph.getNeighbors(vertex.getVertexName())){
+            if (!tspPath.contains(neighbor)){
+                preorderTraversal(graph, neighbor, tspPath);
+            }
+        }
     }
 
     public static class Location {

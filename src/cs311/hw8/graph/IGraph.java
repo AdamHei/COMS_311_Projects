@@ -189,7 +189,7 @@ public interface IGraph<V, E>
         private final String vertex;
         private final V vertexData;
 
-        protected Vertex(String v, V d)
+        public Vertex(String v, V d)
         {
             vertex = v;
             vertexData = d;
@@ -244,7 +244,7 @@ public interface IGraph<V, E>
         private final String vertex2;
         private final E edgeData;
 
-        protected Edge(String v1, String v2, E ed)
+        public Edge(String v1, String v2, E ed)
         {
             vertex1 = v1;
             vertex2 = v2;

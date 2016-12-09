@@ -181,8 +181,7 @@ public class GraphAlgorithms {
 //        }
 
         IGraph<V, E> mst = new Graph<>();
-//        mst.setUndirectedGraph();
-        mst.setDirectedGraph();
+        mst.setUndirectedGraph();
 
         for (Vertex<V> vertex : g.getVertices()) {
             mst.addVertex(vertex.getVertexName(), vertex.getVertexData());
