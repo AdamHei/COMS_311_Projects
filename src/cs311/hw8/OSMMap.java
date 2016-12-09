@@ -28,7 +28,7 @@ import static cs311.hw8.graphalgorithms.GraphAlgorithms.ShortestPath;
 
 public class OSMMap {
 
-    private IGraph<NodeData, EdgeData> map;
+    public IGraph<NodeData, EdgeData> map;
     public final String LOCAL_FILE = "C:/Users/Adam/Desktop/AmesMap.txt";
 
     /**
@@ -441,7 +441,7 @@ public class OSMMap {
     /**
      * Generic Vertex data class that stores coordinates
      */
-    private class NodeData {
+    public class NodeData {
         double latitude, longitude;
 
         NodeData(double lat, double lon) {
@@ -453,7 +453,7 @@ public class OSMMap {
     /**
      * Generic Edge data class that represents street name and length of street
      */
-    private class EdgeData implements IWeight {
+    public class EdgeData implements IWeight {
         double distance;
         String streetName;
 
