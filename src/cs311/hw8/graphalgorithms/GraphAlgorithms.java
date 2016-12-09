@@ -13,6 +13,18 @@ import java.util.*;
  */
 public class GraphAlgorithms {
 
+    /**
+     * Implementation of Dijkstra's Algorithm that outputs the list of edges along the shortest
+     * route from vertex start to vertex end. Computes shortest distance and a map of predecessors
+     * to recurse on.
+     *
+     * @param g           The Graph to run on
+     * @param vertexStart The start vertex
+     * @param vertexEnd   The end vertex
+     * @param <V>         Generic Vertex data
+     * @param <E>         Generic edge data
+     * @return List of edges along shortest route
+     */
     public static <V, E extends IWeight> List<Edge<E>> ShortestPath(IGraph<V, E> g, String vertexStart, String vertexEnd) {
         Map<String, Boolean> marked = new HashMap<>();
         Map<String, Double> distTo = new HashMap<>();
@@ -30,6 +42,7 @@ public class GraphAlgorithms {
         distTo.put(vertexStart, 0.0);
         heap.add(g.getVertex(vertexStart));
 
+        //Dijkstra driver loop
         while (!heap.isEmpty()) {
             Vertex<V> vertex = heap.poll();
             marked.put(vertex.getVertexName(), true);
@@ -48,6 +61,7 @@ public class GraphAlgorithms {
             }
         }
 
+        //Recurse on end predecessor until we find start vertex
         List<Edge<E>> shortestPath = new ArrayList<>();
         Vertex<V> u = g.getVertex(vertexEnd);
         while (predecessor.get(u) != null) {

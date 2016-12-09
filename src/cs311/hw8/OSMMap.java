@@ -28,15 +28,8 @@ import static cs311.hw8.graphalgorithms.GraphAlgorithms.ShortestPath;
 
 public class OSMMap {
 
-    public IGraph<NodeData, EdgeData> map;
+    private IGraph<NodeData, EdgeData> map;
     public final String LOCAL_FILE = "C:/Users/Adam/Desktop/AmesMap.txt";
-
-    public static void main1(String[] args) {
-        OSMMap osmMap = new OSMMap();
-        osmMap.LoadMap(osmMap.LOCAL_FILE);
-
-        osmMap.PipeDream();
-    }
 
     /**
      * Print the approximate number of miles of roadway in Ames using AmesMap.txt
@@ -56,7 +49,7 @@ public class OSMMap {
      *
      * @param args The filenames of the map and route files to parse
      */
-    public static void main(String[] args) {
+    public static void main3(String[] args) {
         String mapFileName = args[0], routeFileName = args[1];
 
         OSMMap osmMap = new OSMMap();
@@ -83,13 +76,55 @@ public class OSMMap {
         //Add the vertex ids along the shortest route between every consecutive pairs of vertices
         for (int j = 0; j < locations.length - 1; j++) {
             List<String> subRoute = osmMap.ShortestRoute(locations[j], locations[j + 1]);
-            //Don't want consecutive same vertices
+            //Don't want consecutive duplicate vertices
             if (j > 0) subRoute.remove(0);
             shortestRouteVertexIds.addAll(subRoute);
         }
 
         List<String> streetNames = osmMap.StreetRoute(shortestRouteVertexIds);
         streetNames.forEach(System.out::println);
+    }
+
+    /**
+     * Outputs the weight-sum of the minimum spanning tree of Ames
+     */
+    public static void main4(String[] args) {
+        OSMMap osmMap = new OSMMap();
+        osmMap.LoadMap(osmMap.LOCAL_FILE);
+
+        System.out.println(osmMap.PipeDream());
+    }
+
+    /**
+     * Finds the Approximate TSP of the coordinates described in the given route file
+     *
+     * @param args Graph file and Route File
+     */
+    public static void main5(String[] args) {
+        String mapFileName = args[0], routeFileName = args[1];
+
+        OSMMap osmMap = new OSMMap();
+        osmMap.LoadMap(mapFileName);
+
+        List<String> routePairs;
+        try {
+            routePairs = Files.readAllLines(Paths.get(routeFileName));
+        } catch (IOException e) {
+            System.out.println(routeFileName + " is an invalid filename");
+            return;
+        }
+
+        List<String> verticesToVisit = new ArrayList<>();
+        for (String pair : routePairs) {
+            String[] latAndLong = pair.split(" ");
+            Location location = new Location(Double.parseDouble(latAndLong[0]), Double.parseDouble(latAndLong[1]));
+            verticesToVisit.add(osmMap.ClosestRoad(location));
+        }
+
+        List<Vertex<NodeData>> tspPath = osmMap.ApproximateTSP(verticesToVisit);
+//        tspPath.forEach(vertex -> System.out.println(vertex.getVertexName()));
+//        System.out.println();
+//        tspPath.forEach(vertex -> System.out.println(osmMap.map.getVertexData(vertex.getVertexName()).latitude + ", " + osmMap.map.getVertexData(vertex.getVertexName()).longitude));
     }
 
     /**
@@ -320,19 +355,35 @@ public class OSMMap {
         return orderedNames;
     }
 
-    public void PipeDream() {
+    /**
+     * @return The weight-sum of the MST of the Graph
+     */
+    public double PipeDream() {
         IGraph<NodeData, EdgeData> mst = Kruscal(map);
         final double[] weightSum = {0.0};
         mst.getEdges().forEach(edge -> weightSum[0] += edge.getEdgeData().getWeight());
-        System.out.println(weightSum[0]);
+        return weightSum[0];
     }
 
+    /**
+     * Finds a Travelling Salesman tour of the given vertex ids that is no more than double the optimal length
+     *
+     * @param vertexIds The vertices to visit
+     * @return The permutation of vertices that yields a good enough path
+     */
     public List<Vertex<NodeData>> ApproximateTSP(List<String> vertexIds) {
         IGraph<NodeData, EdgeData> graph = new Graph<>();
         graph.setUndirectedGraph();
 
-        vertexIds.forEach(vertex -> graph.addVertex(vertex, map.getVertexData(vertex)));
+        //We'll account for ending at the start location later
+        if (vertexIds.get(0).equals(vertexIds.get(vertexIds.size() - 1)) && vertexIds.size() > 1) {
+            vertexIds.remove(vertexIds.size() - 1);
+        }
 
+        //Build a graph with just those vertices
+        vertexIds.forEach(id -> graph.addVertex(id, map.getVertexData(id)));
+
+        //Compute every shortest path and add an edge with that length
         for (int i = 0; i < vertexIds.size() - 1; i++) {
             String first = vertexIds.get(i);
             for (int j = i + 1; j < vertexIds.size(); j++) {
@@ -344,26 +395,27 @@ public class OSMMap {
             }
         }
 
+        //Find the MST
         IGraph<NodeData, EdgeData> mst = Kruscal(graph);
 
-        //Might be empty
+        if (mst.getVertices().size() == 0) return new ArrayList<>();
         Vertex<NodeData> start = mst.getVertices().get(0);
         List<Vertex<NodeData>> tspPath = new ArrayList<>();
 
+        //Traverse the MST
         preorderTraversal(graph, start, tspPath);
 
-        //TODO Go back to start?
-//        tspPath.add(0, tspPath.get(tspPath.size() - 1));
+        //Return to start
+        tspPath.add(tspPath.get(0));
 
         return tspPath;
-
-//        tspPath.forEach(vertex -> System.out.println(graph.getVertexData(vertex.getVertexName()).latitude + ", " + graph.getVertexData(vertex.getVertexName()).longitude));
     }
 
-    private void preorderTraversal(IGraph<NodeData, EdgeData> graph, Vertex<NodeData> vertex, List<Vertex<NodeData>> tspPath){
+    //Helper method for ApproxTSP that recursively traverses the MST in an almost Preorder fashion
+    private void preorderTraversal(IGraph<NodeData, EdgeData> graph, Vertex<NodeData> vertex, List<Vertex<NodeData>> tspPath) {
         tspPath.add(0, vertex);
-        for (Vertex<NodeData> neighbor: graph.getNeighbors(vertex.getVertexName())){
-            if (!tspPath.contains(neighbor)){
+        for (Vertex<NodeData> neighbor : graph.getNeighbors(vertex.getVertexName())) {
+            if (!tspPath.contains(neighbor)) {
                 preorderTraversal(graph, neighbor, tspPath);
             }
         }
@@ -389,9 +441,8 @@ public class OSMMap {
     /**
      * Generic Vertex data class that stores coordinates
      */
-    //TODO make private
-    public class NodeData {
-        public double latitude, longitude;
+    private class NodeData {
+        double latitude, longitude;
 
         NodeData(double lat, double lon) {
             latitude = lat;
@@ -402,7 +453,7 @@ public class OSMMap {
     /**
      * Generic Edge data class that represents street name and length of street
      */
-    public class EdgeData implements IWeight {
+    private class EdgeData implements IWeight {
         double distance;
         String streetName;
 
