@@ -84,8 +84,8 @@ public class OSMMapTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(baos);
         System.setOut(ps);
-        String[] args = {"C:/Users/Adam/Desktop/AmesMap.txt"};
-        OSMMap.main2(args);
+        String[] args = {"AmesMap.txt"};
+        OSMMap.main(args);
         assertEquals(763.012, Double.valueOf(baos.toString()), .1); // delta might be too strict
     }
 

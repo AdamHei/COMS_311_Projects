@@ -29,13 +29,13 @@ import static cs311.hw8.graphalgorithms.GraphAlgorithms.ShortestPath;
 public class OSMMap {
 
     public IGraph<NodeData, EdgeData> map;
-    public final String LOCAL_FILE = "C:/Users/Adam/Desktop/AmesMap.txt";
+    public final String LOCAL_FILE = "AmesMap.txt";
 
     /**
      * Print the approximate number of miles of roadway in Ames using AmesMap.txt
      * ~Total Edge length / 2
      */
-    public static void main2(String[] args) {
+    public static void main(String[] args) {
         String mapFileName = args[0];
 
         OSMMap osmMap = new OSMMap();
